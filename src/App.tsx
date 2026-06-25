@@ -110,7 +110,7 @@ export function App() {
         onSelect={handleSearchSelect}
       />
       <FloorPlanPanel error={locationsError}>
-        <FloorPlan>
+        <FloorPlan dimmed={highlightedLocationId !== null}>
           {(wrapperWidth) =>
             locations.map((loc) => (
               <Marker

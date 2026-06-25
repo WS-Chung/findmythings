@@ -12,12 +12,13 @@ export const CANVAS_H = 740;
 export const DEBOUNCE_MS = 200;
 
 /**
- * Marker rendered size on screen (px).
- * Wide map-pin proportion, centered on (x_pos, y_pos) via
- * CSS `transform: translate(-50%, -50%)`.
+ * Marker rendered size on screen (px), at full canvas scale (wrapperWidth === CANVAS_W).
+ * Tall map-pin proportion. `<Marker>`는 이 값에 현재 캔버스 스케일을 곱해 실제 픽셀 크기로
+ * 렌더링하므로, 도면이 줄어들면 마커도 비례해서 같이 줄어든다.
+ * 마커는 `transform: translate(-50%, -50%)`로 (x_pos, y_pos)에 중심 정렬.
  */
-export const MARKER_WIDTH = 48;
-export const MARKER_HEIGHT = 32;
+export const MARKER_WIDTH = 32;
+export const MARKER_HEIGHT = 48;
 
 /** Hashtag count cap on an Item. Requirement 4.4. */
 export const MAX_HASHTAGS = 4;
