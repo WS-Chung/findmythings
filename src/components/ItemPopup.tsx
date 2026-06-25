@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState, type MouseEvent } from "react";
-import { useItems } from "../hooks/useItems";
 import { TABLES } from "../lib/constants";
 import { buildItemTree } from "../lib/itemTree";
 import { supabase } from "../lib/supabase";
@@ -12,6 +11,12 @@ import "./ItemPopup.css";
 
 export interface ItemPopupProps {
   location: Location;
+  /** 이미 해당 location_id로 필터된 items (App에서 메모리 캐시를 슬라이스해 전달). */
+  items: Item[];
+  /** 전체 items prefetch가 실패했을 때만 not-null. 본문에 안내 텍스트로 노출된다. */
+  itemsError: Error | null;
+  /** 등록/수정/삭제 성공 후 App의 useAllItems.refetch()를 트리거한다. */
+  onItemsChanged: () => void;
   onClose: () => void;
 }
 
@@ -21,11 +26,17 @@ type FormMode = "register" | "edit" | null;
 /**
  * 마커 클릭 시 표시되는 모달 (요구 2.2–2.9, 4.1, 5.1, 6.1).
  *
+ * 데이터 소스:
+ *   - 부모(App)가 useAllItems로 미리 가져온 전체 items 중 해당 location 슬라이스를
+ *     props.items로 넘긴다. 따라서 자체적인 fetch / loading 상태가 없다.
+ *   - 등록/수정/삭제 성공 시 props.onItemsChanged()로 전체 items 재조회를 트리거한다.
+ *
  * - 헤더: location.name (tagline 21/600)
  * - 본문:
  *     formMode === "register" → 빈 RegisterForm
  *     formMode === "edit"     → editingItem을 초기값으로 채운 RegisterForm
- *     그 외에는 useItems 결과를 buildItemTree로 평탄화 → ItemRow 렌더.
+ *     itemsError !== null     → "물품 정보를 불러오지 못했습니다"
+ *     그 외에는 props.items를 buildItemTree로 평탄화 → ItemRow 렌더.
  * - 푸터: "물건 등록" 버튼 (formMode가 활성이면 숨김).
  *
  * 추가 모달:
@@ -41,8 +52,13 @@ type FormMode = "register" | "edit" | null;
  * 백드롭 클릭도 위 우선순위와 동일하게 동작한다(ImagePreview/ConfirmDialog는
  * 자체 백드롭을 가지고 있으므로 이 컴포넌트의 백드롭에는 절대 도달하지 않는다).
  */
-export function ItemPopup({ location, onClose }: ItemPopupProps) {
-  const { data, loading, error, refetch } = useItems(location.id);
+export function ItemPopup({
+  location,
+  items,
+  itemsError,
+  onItemsChanged,
+  onClose,
+}: ItemPopupProps) {
   const [previewItem, setPreviewItem] = useState<Item | null>(null);
   const [formMode, setFormMode] = useState<FormMode>(null);
   const [editingItem, setEditingItem] = useState<Item | null>(null);
@@ -50,10 +66,10 @@ export function ItemPopup({ location, onClose }: ItemPopupProps) {
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
   // 부모/자식 트리화 + parent 후보 목록은 데이터가 바뀔 때만 다시 계산한다.
-  const tree = useMemo(() => buildItemTree(data), [data]);
+  const tree = useMemo(() => buildItemTree(items), [items]);
   const parentCandidates = useMemo(
-    () => data.filter((i) => i.parent_id === null),
-    [data],
+    () => items.filter((i) => i.parent_id === null),
+    [items],
   );
 
   // Esc 키 우선순위 (요구 2.8, 6.5).
@@ -136,7 +152,7 @@ export function ItemPopup({ location, onClose }: ItemPopupProps) {
 
       setDeletingItem(null);
       setDeleteError(null);
-      refetch();
+      onItemsChanged();
     } catch (err) {
       // 요구 6: 다이얼로그 유지 + 에러 메시지 표시.
       console.error("[ItemPopup] delete failed:", err);
@@ -148,7 +164,7 @@ export function ItemPopup({ location, onClose }: ItemPopupProps) {
     setFormMode(null);
     setEditingItem(null);
   };
-  const handleFormSaved = () => refetch();
+  const handleFormSaved = () => onItemsChanged();
 
   const titleId = `item-popup-title-${location.id}`;
 
@@ -192,9 +208,7 @@ export function ItemPopup({ location, onClose }: ItemPopupProps) {
                 formMode === "edit" && editingItem ? editingItem : undefined
               }
             />
-          ) : loading ? (
-            <p className="item-popup__hint">불러오는 중...</p>
-          ) : error ? (
+          ) : itemsError ? (
             <p className="item-popup__hint" role="alert">
               물품 정보를 불러오지 못했습니다
             </p>

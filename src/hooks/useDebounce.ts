@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
  *   debounced 값 변경 = 검색 트리거.
  * - unmount 시에도 cleanup이 실행되어 stale timer가 setState를 호출하지 않는다.
  *
- * 이 훅은 순수하게 값 변환만 담당한다. 실제 검색 RPC 호출은 useSearch가 수행한다.
+ * 이 훅은 순수하게 값 변환만 담당한다. 실제 검색 로직(in-memory filter)은 useSearch가 수행한다.
  */
 export function useDebounce<T>(value: T, ms: number): T {
   const [debounced, setDebounced] = useState<T>(value);

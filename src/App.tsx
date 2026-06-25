@@ -6,25 +6,29 @@ import { Layout } from "./components/Layout";
 import { Marker } from "./components/Marker";
 import { SearchPanel } from "./components/SearchPanel";
 import type { SearchResultRow } from "./components/SearchResultList";
-import { useDebounce } from "./hooks/useDebounce";
+import { useAllItems } from "./hooks/useAllItems";
 import { useLocations } from "./hooks/useLocations";
 import { useSearch } from "./hooks/useSearch";
-import { DEBOUNCE_MS } from "./lib/constants";
 import type { Item, Location, UUID } from "./types/db";
 
 export function App() {
   const { data: locations, error: locationsError } = useLocations();
+  const {
+    data: allItems,
+    error: itemsError,
+    refetch: refetchItems,
+  } = useAllItems();
+
   const [selectedLocationId, setSelectedLocationId] = useState<UUID | null>(
     null,
   );
 
   // ---- 검색 상태 (Task 9.6) ----
   const [query, setQuery] = useState("");
-  const debouncedQuery = useDebounce(query, DEBOUNCE_MS);
-  const {
-    data: searchResults,
-    error: searchError,
-  } = useSearch(debouncedQuery);
+  const { data: searchResults, active: searchActive } = useSearch(
+    query,
+    allItems,
+  );
 
   /**
    * 검색 결과에서 클릭된 행의 item.id.
@@ -86,13 +90,22 @@ export function App() {
       ? locations.find((l) => l.id === selectedLocationId) ?? null
       : null;
 
+  // 선택된 location의 items만 ItemPopup에 전달 (전체 prefetch + 클라이언트 필터).
+  const itemsForSelected = useMemo(
+    () =>
+      selectedLocationId !== null
+        ? allItems.filter((i) => i.location_id === selectedLocationId)
+        : [],
+    [allItems, selectedLocationId],
+  );
+
   return (
     <Layout>
       <SearchPanel
         query={query}
         onQueryChange={setQuery}
         results={enrichedResults}
-        error={searchError}
+        active={searchActive}
         selectedItemId={selectedSearchItemId}
         onSelect={handleSearchSelect}
       />
@@ -115,6 +128,9 @@ export function App() {
       {selectedLocation ? (
         <ItemPopup
           location={selectedLocation}
+          items={itemsForSelected}
+          itemsError={itemsError}
+          onItemsChanged={refetchItems}
           onClose={() => setSelectedLocationId(null)}
         />
       ) : null}

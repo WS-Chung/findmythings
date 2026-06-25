@@ -12,8 +12,10 @@ export interface SearchPanelProps {
   onQueryChange: (next: string) => void;
   /** useSearch 결과를 location 메타와 join한 행들. */
   results: SearchResultRow[];
-  /** useSearch error. null이 아니면 안내 텍스트를 표시한다. */
-  error: Error | null;
+  /**
+   * 검색이 활성화된 상태인지 여부. false이면 결과 리스트가 렌더되지 않는다.
+   */
+  active: boolean;
   /** 현재 강조된 결과 행의 item.id. */
   selectedItemId: UUID | null;
   /** 결과 행 클릭 시 부모로 위임. App이 highlightedLocationId state를 갱신한다. */
@@ -26,13 +28,13 @@ export interface SearchPanelProps {
  * 디자인:
  *   - 패널 컨테이너 자체는 기존 그대로 (parchment bg + hairline + radius-lg).
  *   - SearchInput은 컨테이너 padding 안에서 가로 100%로 확장.
- *   - SearchResultList는 SearchInput 바로 아래에 위치. query=0자면 자기 자신을 렌더하지 않는다.
+ *   - SearchResultList는 SearchInput 바로 아래에 위치. active=false면 자기 자신을 렌더하지 않는다.
  */
 export function SearchPanel({
   query,
   onQueryChange,
   results,
-  error,
+  active,
   selectedItemId,
   onSelect,
 }: SearchPanelProps) {
@@ -41,8 +43,7 @@ export function SearchPanel({
       <SearchInput value={query} onChange={onQueryChange} />
       <SearchResultList
         results={results}
-        query={query}
-        error={error}
+        active={active}
         selectedItemId={selectedItemId}
         onSelect={onSelect}
       />

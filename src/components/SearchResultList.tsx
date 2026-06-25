@@ -9,10 +9,11 @@ export interface SearchResultRow {
 
 export interface SearchResultListProps {
   results: SearchResultRow[];
-  /** 현재 검색바 입력값. trim 후 0자이면 컨테이너 자체가 hidden 처리된다 (요구 7.6). */
-  query: string;
-  /** useSearch error 노출. null이 아니면 안내 텍스트를 표시한다. */
-  error: Error | null;
+  /**
+   * 검색이 활성화된 상태인지 여부 (디바운스된 query.trim().length > 0).
+   * false이면 컨테이너 자체가 렌더되지 않는다 (요구 7.6).
+   */
+  active: boolean;
   /** 사용자가 선택한 결과 행의 item.id. 선택 시각 강조에 사용. */
   selectedItemId: UUID | null;
   /** 행 클릭 시 부모(App)의 highlight 핸들러로 위임한다 (요구 8.1/8.2). */
@@ -23,8 +24,7 @@ export interface SearchResultListProps {
  * 검색 결과 리스트 (요구 7.4–7.7).
  *
  * 표시 규칙:
- *   - query.trim().length === 0           → 컨테이너 자체를 렌더하지 않는다 (요구 7.6).
- *   - error !== null                       → "검색 중 오류가 발생했습니다"
+ *   - active === false                     → 컨테이너 자체를 렌더하지 않는다 (요구 7.6).
  *   - results.length === 0                 → "검색 결과가 없습니다" (요구 7.7)
  *   - results.length > 0                   → 각 행에 item.name + " · " + location.name (요구 7.5)
  *
@@ -33,27 +33,18 @@ export interface SearchResultListProps {
  *   - 강조는 디자인 토큰만 사용 (primary border + parchment 배경).
  *
  * 사진 아이콘 등 다른 정보는 노출하지 않는다 — 명세 7.5는 name과 location.name만 요구한다.
+ *
+ * 메모리 필터(useSearch) 기반으로 동작하므로 error 분기는 없다.
  */
 export function SearchResultList({
   results,
-  query,
-  error,
+  active,
   selectedItemId,
   onSelect,
 }: SearchResultListProps) {
-  const q = query.trim();
-
-  if (q.length === 0) {
+  if (!active) {
     // 요구 7.6: 0자 입력이면 컨테이너 자체가 표시되지 않아야 한다.
     return null;
-  }
-
-  if (error) {
-    return (
-      <div className="search-result-list" role="alert">
-        <p className="search-result-list__hint">검색 중 오류가 발생했습니다</p>
-      </div>
-    );
   }
 
   if (results.length === 0) {

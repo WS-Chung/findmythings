@@ -37,7 +37,7 @@ export interface RegisterFormProps {
   parentCandidates: Item[];
   /** 취소 또는 저장 성공 후 폼을 닫는다. */
   onClose: () => void;
-  /** 저장 성공 시 호출되어 부모의 useItems.refetch()를 트리거한다. */
+  /** 저장 성공 시 호출되어 부모의 useAllItems.refetch()를 트리거한다. */
   onSaved: () => void;
   /**
    * 수정 대상 Item. 없으면 등록 모드(=insert), 있으면 수정 모드(=update).
