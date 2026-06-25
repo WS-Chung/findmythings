@@ -1,14 +1,25 @@
 /* ============================================================
- * SearchPanel — 좌측 15fr 컬럼.
- *   Task 9에서 검색바와 결과 리스트로 채워진다.
+ * SearchPanel — 좌측 컬럼.
+ *   - 종이톤 페이지 배경에서 떠 보이도록 흰 배경 + 2px 테두리 + shadow
+ *   - margin-top 30px 로 FloorPlan과 동일한 상단 위치에서 시작
+ *   - align-self는 grid 기본(stretch)으로 row 높이를 도면과 동일하게 따라간다
+ *     → 결과: SearchPanel의 박스 높이 = FloorPlan의 박스 높이
+ *   - 내부는 SearchInput + SearchResultList를 세로로 배치
  * ============================================================ */
 .search-panel {
   grid-column: 1;
-  background: var(--color-canvas-parchment);
-  border: 1px solid var(--color-hairline);
+  margin-top: 30px;
+  background: var(--color-canvas);
+  border: 2px solid var(--color-hairline);
   border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-elevated);
   padding: var(--sp-lg);
-  min-height: 200px;
   font-family: var(--font-text);
   color: var(--color-ink);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-md);
+  /* grid가 align-items: stretch이므로 height는 자동으로 row와 동일해진다. */
+  min-height: 200px;
+  overflow: auto;
 }

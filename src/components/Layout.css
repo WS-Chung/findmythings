@@ -1,7 +1,16 @@
 /* ============================================================
- * Layout — 1920×1080 기준 컨텐츠 영역 80% 폭 가로 중앙 정렬.
- *   그 안에서 Search:gap:FloorPlan = 15 : 5 : 80 비율.
- *   가운데 5fr 컬럼이 시각적 gap 역할을 하므로 CSS gap은 0.
+ * Layout — 컨텐츠 영역 가로 중앙 정렬.
+ *
+ * 데스크탑 (≥ 834px):
+ *   - 80vw 폭, 가운데 정렬
+ *   - 그리드: Search(30fr) : gap(5fr) : FloorPlan(65fr)
+ *     도면이 자기 컬럼 안에서 85% 폭만 차지하므로 남는 여유를 검색에 더 배분
+ *   - align-items: stretch → 두 BOX의 row height가 동일하게 잡힌다
+ *
+ * 모바일/태블릿 포트레이트 (≤ 833px):
+ *   - 단일 컬럼, 95vw 폭
+ *   - SearchPanel이 위, FloorPlanPanel이 아래 (DOM 순서 그대로)
+ *   - 두 BOX 사이 gap을 명시적으로 두어 호흡 확보
  * ============================================================ */
 .layout {
   width: 80vw;
@@ -9,7 +18,24 @@
   min-height: 100vh;
   padding: var(--sp-lg) 0;
   display: grid;
-  grid-template-columns: 15fr 5fr 80fr;
+  grid-template-columns: 30fr 5fr 65fr;
   gap: 0;
   align-items: stretch;
+}
+
+@media (max-width: 833px) {
+  .layout {
+    width: 95vw;
+    grid-template-columns: 1fr;
+    gap: var(--sp-lg);
+    align-items: start;
+  }
+
+  /* 모바일에서는 grid-column의 명시 위치를 무시하고 DOM 순서대로 쌓이게 한다.
+   * SearchPanel.tsx / FloorPlanPanel.tsx에서 grid-column: 1 / 3을 지정해 두었지만,
+   * 단일 컬럼 모드에서는 첫 번째(유일한) 컬럼으로 모두 들어간다. */
+  .search-panel,
+  .floorplan-panel {
+    grid-column: 1;
+  }
 }

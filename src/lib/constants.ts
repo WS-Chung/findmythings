@@ -13,10 +13,10 @@ export const DEBOUNCE_MS = 200;
 
 /**
  * Marker rendered size on screen (px).
- * Map-pin proportion (taller than wide), centered on (x_pos, y_pos)
- * via CSS `transform: translate(-50%, -50%)`.
+ * Wide map-pin proportion, centered on (x_pos, y_pos) via
+ * CSS `transform: translate(-50%, -50%)`.
  */
-export const MARKER_WIDTH = 24;
+export const MARKER_WIDTH = 48;
 export const MARKER_HEIGHT = 32;
 
 /** Hashtag count cap on an Item. Requirement 4.4. */

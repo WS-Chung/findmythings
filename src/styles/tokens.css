@@ -14,6 +14,21 @@
   --color-on-primary: #ffffff;
   --color-ink-muted-48: #7a7a7a;
 
+  /**
+   * Page background — 종이/시멘트벽 톤의 차분한 회색.
+   * BOX(SearchPanel/FloorPlan)는 흰색이고, 이 배경 위에 살짝 떠 있는 듯한 입체감을
+   * shadow-elevated와 조합해 표현한다.
+   */
+  --color-surface-page: #e8e8ec;
+
+  /**
+   * Elevated surface shadow — BOX 컨테이너를 종이톤 배경에서 띄워 보이게 한다.
+   * Apple style의 product-shadow보다 약하게 적용해 미니멀함을 유지한다.
+   */
+  --shadow-elevated:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 6px 18px rgba(0, 0, 0, 0.08);
+
   /* typography */
   --font-display: "SF Pro Display", system-ui, -apple-system, sans-serif;
   --font-text: "SF Pro Text", system-ui, -apple-system, sans-serif;
@@ -44,7 +59,7 @@ body,
 #root {
   margin: 0;
   padding: 0;
-  background: var(--color-canvas);
+  background: var(--color-surface-page);
   color: var(--color-ink);
   font-family: var(--font-text);
   font-size: var(--fs-body);

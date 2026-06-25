@@ -23,7 +23,7 @@ describe("sanity", () => {
 
   it("exposes validation/debounce/image constants", () => {
     expect(DEBOUNCE_MS).toBeGreaterThan(0);
-    expect(MARKER_WIDTH).toBe(24);
+    expect(MARKER_WIDTH).toBe(48);
     expect(MARKER_HEIGHT).toBe(32);
     expect(MAX_HASHTAGS).toBe(4);
     expect(MAX_NAME_LEN).toBe(20);
