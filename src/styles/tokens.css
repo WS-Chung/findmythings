@@ -29,9 +29,10 @@
     0 1px 2px rgba(0, 0, 0, 0.04),
     0 6px 18px rgba(0, 0, 0, 0.08);
 
-  /* typography */
-  --font-display: "SF Pro Display", system-ui, -apple-system, sans-serif;
-  --font-text: "SF Pro Text", system-ui, -apple-system, sans-serif;
+  /* typography — Pretendard로 통일 (한글 가독성 + variable weight 지원).
+   * display/text 분리는 유지하지만 같은 family를 가리킨다. */
+  --font-display: "Pretendard Variable", Pretendard, system-ui, -apple-system, sans-serif;
+  --font-text: "Pretendard Variable", Pretendard, system-ui, -apple-system, sans-serif;
   --fs-body: 17px;
   --lh-body: 1.47;
   --ls-body: -0.374px;

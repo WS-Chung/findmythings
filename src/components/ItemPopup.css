@@ -98,10 +98,12 @@
 }
 
 /* button-primary 토큰 적용:
- *   bg=primary, color=on-primary, radius=pill, padding 11×22.
+ *   bg=primary, color=on-primary, radius=pill, padding 11px vertical.
+ *   width 120px 고정 — ItemRow의 수정/삭제 합계 폭과 정확히 일치.
  */
 .item-popup__register {
-  padding: 11px 22px;
+  width: 120px;
+  padding: 11px 0;
   background: var(--color-primary);
   color: var(--color-on-primary);
   border: 1px solid var(--color-primary);
@@ -109,6 +111,7 @@
   font-family: var(--font-text);
   font-size: var(--fs-body);
   letter-spacing: var(--ls-body);
+  text-align: center;
   cursor: pointer;
 }
 

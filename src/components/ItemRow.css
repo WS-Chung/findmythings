@@ -1,9 +1,12 @@
 /* ============================================================
  * ItemRow — Item_Popup 내부 한 줄.
  *   - 들여쓰기: indent × --sp-lg (24px) 좌측 padding
+ *   - 상/하위 계층 시각 구분 (indent=0: Parent_Item, indent=1: Child_Item)
+ *       · Parent: 18px / 600 weight (1pt 크게 + 굵게)
+ *       · Child : 17px / 400 weight (기본)
  *   - 사진 버튼: 텍스트 이모지(📷) + 접근 가능한 hit-target
  *   - 해시태그: --color-canvas-parchment 배경 chip
- *   - 수정/삭제: 작은 secondary 버튼 (Task 8에서 실제 wire)
+ *   - 수정/삭제: 합쳐서 120px (등록 버튼과 동일 폭), gap 4px, 각 58px
  * ============================================================ */
 .item-row {
   list-style: none;
@@ -33,6 +36,19 @@
 
 .item-row__name {
   flex: 0 0 auto;
+}
+
+/* 상/하위 시각 구분 ─ 이름 부분에만 적용해 해시태그/액션은 그대로 둔다. */
+.item-row--indent-0 .item-row__name {
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: var(--ls-body);
+}
+
+.item-row--indent-1 .item-row__name {
+  font-weight: 400;
+  font-size: var(--fs-body);
+  color: var(--color-ink-muted-80, #333333);
 }
 
 .item-row__photo {
@@ -79,14 +95,19 @@
   line-height: 1.4;
 }
 
+/* 수정/삭제 그룹 — 합계 폭을 등록 버튼(120px)과 동일하게 고정.
+ * 각 버튼은 flex 1 1 50%로 균등 분할 → 58px씩. */
 .item-row__actions {
   margin-left: auto;
-  display: inline-flex;
-  gap: var(--sp-xs);
+  display: flex;
+  gap: 4px;
+  flex: 0 0 120px;
+  width: 120px;
 }
 
 .item-row__action {
-  padding: 4px var(--sp-sm);
+  flex: 1 1 50%;
+  padding: 4px 0;
   background: transparent;
   color: var(--color-primary);
   border: 1px solid var(--color-primary);
@@ -94,6 +115,8 @@
   font-family: var(--font-text);
   font-size: var(--fs-caption);
   letter-spacing: 0;
+  text-align: center;
+  white-space: nowrap;
   cursor: pointer;
 }
 
