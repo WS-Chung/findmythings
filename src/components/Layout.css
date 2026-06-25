@@ -1,0 +1,15 @@
+/* ============================================================
+ * Layout — 1920×1080 기준 컨텐츠 영역 80% 폭 가로 중앙 정렬.
+ *   그 안에서 Search:gap:FloorPlan = 15 : 5 : 80 비율.
+ *   가운데 5fr 컬럼이 시각적 gap 역할을 하므로 CSS gap은 0.
+ * ============================================================ */
+.layout {
+  width: 80vw;
+  margin: 0 auto;
+  min-height: 100vh;
+  padding: var(--sp-lg) 0;
+  display: grid;
+  grid-template-columns: 15fr 5fr 80fr;
+  gap: 0;
+  align-items: stretch;
+}

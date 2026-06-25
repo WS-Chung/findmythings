@@ -1,0 +1,121 @@
+/* ============================================================
+ * ConfirmDialog — 삭제 확인 다이얼로그.
+ *   요구 14.5/14.6: 1px solid hairline + radius-lg, 토큰 외 색상 미도입.
+ *   z-index는 ItemPopup(1000) 위에 떠야 하므로 1100.
+ * ============================================================ */
+.confirm-dialog__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-lg);
+}
+
+.confirm-dialog {
+  position: relative;
+  width: min(400px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-md);
+  background: var(--color-canvas);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-lg);
+  font-family: var(--font-text);
+  color: var(--color-ink);
+}
+
+.confirm-dialog__message {
+  margin: 0;
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  letter-spacing: var(--ls-body);
+  color: var(--color-ink);
+}
+
+/* 에러 안내는 RegisterForm과 동일 패턴: parchment + ink + body-strong. */
+.confirm-dialog__error {
+  margin: 0;
+  padding: var(--sp-xs) var(--sp-sm);
+  background: var(--color-canvas-parchment);
+  color: var(--color-ink);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.confirm-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-xs);
+}
+
+/* button-secondary-pill: 투명 bg, primary 텍스트, primary border, pill. */
+.confirm-dialog__cancel {
+  padding: 11px 22px;
+  background: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-text);
+  font-size: var(--fs-body);
+  letter-spacing: var(--ls-body);
+  cursor: pointer;
+}
+
+.confirm-dialog__cancel:hover:not(:disabled),
+.confirm-dialog__cancel:focus-visible:not(:disabled) {
+  background: var(--color-canvas-parchment);
+  outline: none;
+}
+
+.confirm-dialog__cancel:disabled {
+  cursor: not-allowed;
+  color: var(--color-ink-muted-48);
+  border-color: var(--color-hairline);
+}
+
+/* 기본(non-danger) 확인 버튼: button-primary 토큰. */
+.confirm-dialog__confirm {
+  padding: 11px 22px;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-text);
+  font-size: var(--fs-body);
+  letter-spacing: var(--ls-body);
+  cursor: pointer;
+}
+
+.confirm-dialog__confirm:hover:not(:disabled),
+.confirm-dialog__confirm:focus-visible:not(:disabled) {
+  background: var(--color-primary-focus);
+  border-color: var(--color-primary-focus);
+  outline: none;
+}
+
+.confirm-dialog__confirm:disabled {
+  cursor: not-allowed;
+  background: var(--color-canvas-parchment);
+  color: var(--color-ink-muted-48);
+  border-color: var(--color-hairline);
+}
+
+/* 위험 강조(danger=true): ink 배경 + on-primary 텍스트. */
+.confirm-dialog__confirm--danger {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-on-primary);
+}
+
+.confirm-dialog__confirm--danger:hover:not(:disabled),
+.confirm-dialog__confirm--danger:focus-visible:not(:disabled) {
+  background: var(--color-ink-muted-48);
+  border-color: var(--color-ink-muted-48);
+}

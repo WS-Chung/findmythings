@@ -1,0 +1,32 @@
+/* ============================================================
+ * FloorPlan — 1060:740 가상 캔버스.
+ *   - 부모 폭에 맞춰 width: 100%
+ *   - aspect-ratio: 1060 / 740 → 높이는 자동으로 결정
+ *   - background.png는 자식 .floorplan__bg가 55% 불투명도로 표시 (요구 1.2 — 30%→55% 사용자 가독성 조정)
+ *   - 마커는 .floorplan__layer 안에 절대 좌표로 배치
+ * ============================================================ */
+.floorplan {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1060 / 740;
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-lg);
+  background: var(--color-canvas);
+  overflow: hidden;
+}
+
+.floorplan__bg {
+  position: absolute;
+  inset: 0;
+  background-image: url("/background.png");
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.floorplan__layer {
+  position: absolute;
+  inset: 0;
+}

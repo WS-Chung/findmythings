@@ -1,0 +1,23 @@
+/* ============================================================
+ * Highlight pulse — Marker 강조 애니메이션
+ *   주기 2s, 2회 반복 (요구 8.3: 1.5–3s 주기, ≥2회)
+ * ============================================================ */
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.25);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+.marker--highlight {
+  animation: pulse 2s ease-in-out 2;
+  filter: drop-shadow(0 0 6px var(--color-primary-focus));
+}

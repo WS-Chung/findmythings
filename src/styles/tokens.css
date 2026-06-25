@@ -1,0 +1,59 @@
+/* ============================================================
+ * Design Tokens — Apple style
+ *   Sourced from [DESIGN]Apple_style.md, scoped to Find My Things.
+ *   모든 컴포넌트는 :root CSS 변수만 참조합니다.
+ * ============================================================ */
+:root {
+  /* colors */
+  --color-primary: #0066cc;
+  --color-primary-focus: #0071e3;
+  --color-ink: #1d1d1f;
+  --color-canvas: #ffffff;
+  --color-canvas-parchment: #f5f5f7;
+  --color-hairline: #e0e0e0;
+  --color-on-primary: #ffffff;
+  --color-ink-muted-48: #7a7a7a;
+
+  /* typography */
+  --font-display: "SF Pro Display", system-ui, -apple-system, sans-serif;
+  --font-text: "SF Pro Text", system-ui, -apple-system, sans-serif;
+  --fs-body: 17px;
+  --lh-body: 1.47;
+  --ls-body: -0.374px;
+  --fs-tagline: 21px;
+  --fs-caption: 14px;
+
+  /* radii */
+  --radius-sm: 8px;
+  --radius-md: 11px;
+  --radius-lg: 18px;
+  --radius-pill: 9999px;
+
+  /* spacing */
+  --sp-xxs: 4px;
+  --sp-xs: 8px;
+  --sp-sm: 12px;
+  --sp-md: 17px;
+  --sp-lg: 24px;
+  --sp-xl: 32px;
+  --sp-xxl: 48px;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-text);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  letter-spacing: var(--ls-body);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}

@@ -1,0 +1,24 @@
+/* ============================================================
+ * FloorPlanPanel — 우측 80fr 컬럼.
+ *   <FloorPlan>을 그대로 보유하거나, locations fetch가 실패하면
+ *   안내 텍스트를 표시한다 (요구 1.7).
+ * ============================================================ */
+.floorplan-panel {
+  grid-column: 3;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-text);
+  color: var(--color-ink);
+}
+
+.floorplan-panel__error {
+  padding: var(--sp-lg);
+  text-align: center;
+  color: var(--color-ink-muted-48);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  letter-spacing: var(--ls-body);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-lg);
+  background: var(--color-canvas);
+}

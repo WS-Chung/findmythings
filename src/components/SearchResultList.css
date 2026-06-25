@@ -1,0 +1,64 @@
+/* ============================================================
+ * SearchResultList — 검색바 아래에 표시되는 리스트.
+ *   행은 design 토큰만 사용한다 (배경/색/반경).
+ *   선택된 행은 primary border + parchment 배경으로 강조한다.
+ * ============================================================ */
+.search-result-list {
+  list-style: none;
+  margin: var(--sp-sm) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-xxs);
+}
+
+/* 안내 텍스트(에러/결과 없음) 컨테이너용 변형. */
+.search-result-list .search-result-list__hint {
+  margin: 0;
+  padding: var(--sp-sm) var(--sp-md);
+  color: var(--color-ink-muted-48);
+  font-family: var(--font-text);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  letter-spacing: var(--ls-body);
+  text-align: center;
+}
+
+.search-result-list__row {
+  display: block;
+  width: 100%;
+  padding: var(--sp-sm) var(--sp-md);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--font-text);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  letter-spacing: var(--ls-body);
+  color: var(--color-ink);
+}
+
+.search-result-list__row:hover,
+.search-result-list__row:focus-visible {
+  background: var(--color-canvas);
+  outline: none;
+}
+
+.search-result-list__row--selected {
+  background: var(--color-canvas);
+  border-color: var(--color-primary);
+}
+
+.search-result-list__name {
+  font-weight: 500;
+}
+
+.search-result-list__sep {
+  color: var(--color-ink-muted-48);
+}
+
+.search-result-list__location {
+  color: var(--color-ink-muted-48);
+}

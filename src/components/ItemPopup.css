@@ -1,0 +1,120 @@
+/* ============================================================
+ * ItemPopup — 마커 클릭 시 표시되는 모달.
+ *   요구 14.5: 1px solid hairline + radius-lg (18px).
+ *   백드롭은 반투명 검정, 본체는 canvas 배경.
+ * ============================================================ */
+.item-popup__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-lg);
+}
+
+.item-popup {
+  position: relative;
+  width: min(540px, 100%);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-canvas);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-lg);
+  font-family: var(--font-text);
+  color: var(--color-ink);
+}
+
+.item-popup__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-sm);
+  margin-bottom: var(--sp-md);
+}
+
+.item-popup__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-tagline);
+  font-weight: 600;
+  letter-spacing: 0.231px;
+  line-height: 1.19;
+  color: var(--color-ink);
+}
+
+.item-popup__close {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  color: var(--color-ink-muted-48);
+  font-size: 22px;
+  line-height: 1;
+}
+
+.item-popup__close:hover,
+.item-popup__close:focus-visible {
+  background: var(--color-canvas-parchment);
+  color: var(--color-ink);
+  outline: none;
+}
+
+.item-popup__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.item-popup__hint {
+  margin: 0;
+  padding: var(--sp-lg) 0;
+  text-align: center;
+  color: var(--color-ink-muted-48);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  letter-spacing: var(--ls-body);
+}
+
+.item-popup__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.item-popup__footer {
+  margin-top: var(--sp-md);
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* button-primary 토큰 적용:
+ *   bg=primary, color=on-primary, radius=pill, padding 11×22.
+ */
+.item-popup__register {
+  padding: 11px 22px;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-text);
+  font-size: var(--fs-body);
+  letter-spacing: var(--ls-body);
+  cursor: pointer;
+}
+
+.item-popup__register:hover,
+.item-popup__register:focus-visible {
+  background: var(--color-primary-focus);
+  border-color: var(--color-primary-focus);
+  outline: none;
+}
