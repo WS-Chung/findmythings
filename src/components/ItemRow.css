@@ -18,7 +18,7 @@
 .item-row {
   list-style: none;
   display: grid;
-  grid-template-columns: minmax(160px, 1.4fr) minmax(0, 1fr) 120px;
+  grid-template-columns: minmax(140px, 1fr) minmax(0, 1.2fr) 120px;
   align-items: center;
   gap: var(--sp-sm);
   padding: var(--sp-xs) 0;
@@ -58,16 +58,16 @@
   white-space: nowrap;
 }
 
-/* 상/하위 시각 구분 ─ 이름 부분에만. */
+/* 상/하위 시각 구분 ─ 이름 부분에만. 폰트 1pt 축소 적용. */
 .item-row--indent-0 .item-row__name {
   font-weight: 600;
-  font-size: 18px;
+  font-size: 17px;
   letter-spacing: var(--ls-body);
 }
 
 .item-row--indent-1 .item-row__name {
   font-weight: 400;
-  font-size: var(--fs-body);
+  font-size: 16px;
   color: var(--color-ink-muted-80, #333333);
 }
 
@@ -93,15 +93,18 @@
   outline: none;
 }
 
-/* tags 컬럼 — 해시태그가 없는 행에는 placeholder가 들어가 자리 유지. */
+/* tags 컬럼 — 해시태그가 없는 행에는 placeholder가 들어가 자리 유지.
+ * 줄바꿈을 방지하기 위해 nowrap + overflow hidden. 컬럼 폭이 부족하면
+ * 마지막 칩이 잘리는 형태로 처리. */
 .item-row__tags {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: var(--sp-xxs);
   min-width: 0;
+  overflow: hidden;
 }
 
 .item-row__tags-empty {
@@ -109,6 +112,7 @@
 }
 
 .item-row__tag {
+  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   padding: 2px var(--sp-xs);
@@ -118,6 +122,7 @@
   font-size: var(--fs-caption);
   letter-spacing: 0;
   line-height: 1.4;
+  white-space: nowrap;
 }
 
 /* actions 컬럼 — 120px 고정, 등록 버튼과 동일 폭. 각 버튼 58px. */

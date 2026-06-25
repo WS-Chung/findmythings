@@ -17,8 +17,8 @@ export const DEBOUNCE_MS = 200;
  * 렌더링하므로, 도면이 줄어들면 마커도 비례해서 같이 줄어든다.
  * 마커는 `transform: translate(-50%, -50%)`로 (x_pos, y_pos)에 중심 정렬.
  */
-export const MARKER_WIDTH = 32;
-export const MARKER_HEIGHT = 48;
+export const MARKER_WIDTH = 24;
+export const MARKER_HEIGHT = 36;
 
 /** Hashtag count cap on an Item. Requirement 4.4. */
 export const MAX_HASHTAGS = 4;
