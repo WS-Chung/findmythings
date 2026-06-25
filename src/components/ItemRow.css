@@ -1,18 +1,26 @@
 /* ============================================================
  * ItemRow — Item_Popup 내부 한 줄.
- *   - 들여쓰기: indent × --sp-lg (24px) 좌측 padding
- *   - 상/하위 계층 시각 구분 (indent=0: Parent_Item, indent=1: Child_Item)
- *       · Parent: 18px / 600 weight (1pt 크게 + 굵게)
- *       · Child : 17px / 400 weight (기본)
- *   - 사진 버튼: 텍스트 이모지(📷) + 접근 가능한 hit-target
- *   - 해시태그: --color-canvas-parchment 배경 chip
- *   - 수정/삭제: 합쳐서 120px (등록 버튼과 동일 폭), gap 4px, 각 58px
+ *
+ * 레이아웃 (grid 3컬럼):
+ *   col1 [lead]   minmax(160px, 1.4fr) → 이름 + 사진 아이콘
+ *   col2 [tags]   minmax(0,   1fr)     → 해시태그 (없으면 placeholder)
+ *   col3 [actions] 120px               → 수정/삭제 (등록 버튼과 동일 폭)
+ *
+ *   세 컬럼이 항상 같은 폭으로 잡혀 있어, 이름 길이가 들쭉날쭉해도
+ *   해시태그·액션 영역이 좌우로 정확히 정렬된다.
+ *
+ * 들여쓰기는 .item-row__lead의 padding-left로만 표현해 grid 정렬을 깨지 않는다.
+ *
+ * 상/하위 시각 구분 (이름 부분에만):
+ *   Parent (indent=0): 18px / 600 (1pt 크게 + 굵게)
+ *   Child  (indent=1): 17px / 400 + 살짝 흐린 텍스트 색
  * ============================================================ */
 .item-row {
   list-style: none;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(160px, 1.4fr) minmax(0, 1fr) 120px;
   align-items: center;
-  gap: var(--sp-xs);
+  gap: var(--sp-sm);
   padding: var(--sp-xs) 0;
   border-bottom: 1px solid var(--color-hairline);
   font-family: var(--font-text);
@@ -26,19 +34,31 @@
   border-bottom: none;
 }
 
-.item-row--indent-0 {
+/* lead 컬럼 — 이름 + 사진 아이콘 묶음. 들여쓰기는 여기서 처리. */
+.item-row__lead {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-xs);
+  min-width: 0; /* grid item 안에서 ellipsis가 작동하려면 필수 */
+}
+
+.item-row--indent-0 .item-row__lead {
   padding-left: 0;
 }
 
-.item-row--indent-1 {
+.item-row--indent-1 .item-row__lead {
   padding-left: var(--sp-lg);
 }
 
 .item-row__name {
-  flex: 0 0 auto;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* 상/하위 시각 구분 ─ 이름 부분에만 적용해 해시태그/액션은 그대로 둔다. */
+/* 상/하위 시각 구분 ─ 이름 부분에만. */
 .item-row--indent-0 .item-row__name {
   font-weight: 600;
   font-size: 18px;
@@ -73,14 +93,19 @@
   outline: none;
 }
 
+/* tags 컬럼 — 해시태그가 없는 행에는 placeholder가 들어가 자리 유지. */
 .item-row__tags {
-  flex: 1 1 auto;
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-wrap: wrap;
   gap: var(--sp-xxs);
+  min-width: 0;
+}
+
+.item-row__tags-empty {
+  display: block;
 }
 
 .item-row__tag {
@@ -95,14 +120,10 @@
   line-height: 1.4;
 }
 
-/* 수정/삭제 그룹 — 합계 폭을 등록 버튼(120px)과 동일하게 고정.
- * 각 버튼은 flex 1 1 50%로 균등 분할 → 58px씩. */
+/* actions 컬럼 — 120px 고정, 등록 버튼과 동일 폭. 각 버튼 58px. */
 .item-row__actions {
-  margin-left: auto;
   display: flex;
   gap: 4px;
-  flex: 0 0 120px;
-  width: 120px;
 }
 
 .item-row__action {

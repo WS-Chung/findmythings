@@ -13,6 +13,10 @@ export interface ItemPopupProps {
   location: Location;
   /** 이미 해당 location_id로 필터된 items (App에서 메모리 캐시를 슬라이스해 전달). */
   items: Item[];
+  /** 전체 items (수정 시 수납장 이동을 위해 다른 location의 parent 후보를 동적 계산). */
+  allItems: Item[];
+  /** 전체 locations (수정 시 수납장 이동 드롭다운 옵션). */
+  locations: Location[];
   /** 전체 items prefetch가 실패했을 때만 not-null. 본문에 안내 텍스트로 노출된다. */
   itemsError: Error | null;
   /** 등록/수정/삭제 성공 후 App의 useAllItems.refetch()를 트리거한다. */
@@ -55,6 +59,8 @@ type FormMode = "register" | "edit" | null;
 export function ItemPopup({
   location,
   items,
+  allItems,
+  locations,
   itemsError,
   onItemsChanged,
   onClose,
@@ -201,6 +207,8 @@ export function ItemPopup({
           {formMode ? (
             <RegisterForm
               location={location}
+              locations={locations}
+              allItems={allItems}
               parentCandidates={parentCandidates}
               onClose={handleFormClose}
               onSaved={handleFormSaved}

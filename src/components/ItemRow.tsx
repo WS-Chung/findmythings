@@ -16,10 +16,15 @@ export interface ItemRowProps {
 /**
  * Item_Popup의 한 행.
  *
- * - 들여쓰기는 좌측 padding으로 표현 (indent × --sp-lg).
+ * 레이아웃: CSS grid 3컬럼.
+ *   [lead: 이름 + 사진]  [해시태그]  [수정/삭제]
+ *
+ * - 각 컬럼의 폭이 고정되어 있어 이름 길이가 달라도 세 영역이 좌우로 정렬된다.
+ *   이름이 컬럼 폭을 넘으면 ellipsis 처리.
+ * - 들여쓰기는 lead 컬럼 안의 padding-left로 처리해 grid 정렬을 깨지 않는다.
+ * - 해시태그가 없는 행에는 빈 placeholder를 렌더링해 grid cell 자리를 유지한다.
  * - 사진 아이콘(📷)은 `item.image_url`이 truthy일 때만 노출 (요구 2.5, 2.6).
- * - 해시태그는 작은 회색 칩으로 inline 표시.
- * - "수정"/"삭제" 버튼은 클릭 시 부모로 위임(onEdit/onDelete). 부모가 폼/다이얼로그를 띄운다.
+ * - "수정"/"삭제" 버튼은 부모로 위임(onEdit/onDelete).
  */
 export function ItemRow({
   item,
@@ -45,18 +50,19 @@ export function ItemRow({
       className={`item-row item-row--indent-${indent}`}
       data-item-id={item.id}
     >
-      <span className="item-row__name">{item.name}</span>
-
-      {item.image_url ? (
-        <button
-          type="button"
-          className="item-row__photo"
-          onClick={handlePhotoClick}
-          aria-label={`${item.name} 사진 보기`}
-        >
-          📷
-        </button>
-      ) : null}
+      <div className="item-row__lead">
+        <span className="item-row__name">{item.name}</span>
+        {item.image_url ? (
+          <button
+            type="button"
+            className="item-row__photo"
+            onClick={handlePhotoClick}
+            aria-label={`${item.name} 사진 보기`}
+          >
+            📷
+          </button>
+        ) : null}
+      </div>
 
       {item.hashtags.length > 0 ? (
         <ul className="item-row__tags" aria-label="해시태그">
@@ -66,7 +72,9 @@ export function ItemRow({
             </li>
           ))}
         </ul>
-      ) : null}
+      ) : (
+        <span className="item-row__tags-empty" aria-hidden="true" />
+      )}
 
       <div className="item-row__actions">
         <button

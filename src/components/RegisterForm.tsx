@@ -23,16 +23,19 @@ import {
   validateName,
   validateParent,
 } from "../lib/validators";
-import type { Item, Location } from "../types/db";
+import type { Item, Location, UUID } from "../types/db";
 import "./RegisterForm.css";
 
 export interface RegisterFormProps {
-  /** 폼이 활성화된 Location (헤더는 ItemPopup이 표시함). */
+  /** 폼이 활성화된 Location (헤더는 ItemPopup이 표시함, 등록 모드의 기본 location). */
   location: Location;
+  /** 전체 locations (수정 모드에서 수납장 이동 드롭다운 옵션). */
+  locations: Location[];
+  /** 전체 items (parent 후보를 selectedLocationId 기준으로 동적 계산). */
+  allItems: Item[];
   /**
-   * 같은 Location 내 Parent_Item 후보들 (parent_id IS NULL).
-   * select 옵션의 source가 된다. 빈 배열이면 "(없음)"만 선택 가능.
-   * 수정 모드에서는 자기 자신이 자동으로 옵션에서 제외된다.
+   * 같은 Location 내 Parent_Item 후보들 — 등록 모드의 초기 옵션.
+   * 수정 모드에서 수납장 이동 시 allItems에서 재계산되므로 fallback 용도.
    */
   parentCandidates: Item[];
   /** 취소 또는 저장 성공 후 폼을 닫는다. */
@@ -41,7 +44,8 @@ export interface RegisterFormProps {
   onSaved: () => void;
   /**
    * 수정 대상 Item. 없으면 등록 모드(=insert), 있으면 수정 모드(=update).
-   * 초기 폼 상태는 (name, hashtags, image_url, parent_id) 모두 이 값에서 가져온다 (Property 10).
+   * 초기 폼 상태는 (name, hashtags, image_url, parent_id, location_id) 모두
+   * 이 값에서 가져온다 (Property 10).
    */
   editItem?: Item;
 }
@@ -50,29 +54,36 @@ export interface RegisterFormProps {
  * 물품 등록/수정 공용 폼 (요구 4.1–4.11, 5.1–5.6, 9.3/9.4, 11.5, 14.4).
  *
  * 모드 분기:
- *   - editItem === undefined → 등록 모드. supabase.from(items).insert(...)
- *   - editItem !== undefined → 수정 모드. supabase.from(items).update(...).eq('id', editItem.id)
+ *   - editItem === undefined → 등록 모드. supabase.from(items).insert(...).
+ *     location_id는 props.location.id로 고정 (현재 마커 위치).
+ *   - editItem !== undefined → 수정 모드. supabase.from(items).update(...).
+ *     location_id를 폼에서 변경 가능 (수납장 이동).
  *
  * Property 10 보존:
  *   - 수정 모드에서 새 사진 파일을 선택하지 않으면 update payload의 image_url은
  *     editItem.image_url 그대로 유지된다.
  *
- * 디자인 토큰:
- *   - 저장 버튼: button-primary
- *   - 취소 버튼: button-secondary-pill
- *
- * 해시태그 입력 UX:
- *   - 단일 input + 콤마/Enter로 chip 추가. ×로 chip 제거.
- *   - 최대 MAX_HASHTAGS(=4)개에 도달하면 더 이상 추가되지 않는다.
+ * 수납장 이동 (수정 모드 전용):
+ *   - selectedLocationId state로 현재 폼이 가리키는 location을 관리.
+ *   - 사용자가 드롭다운으로 변경하면 parent_id를 null로 리셋해 다른 수납장의
+ *     1계층 물품을 새로 고를 수 있게 한다 (요구 9.3 무결성과 호환).
+ *   - parentCandidates는 selectedLocationId 기준 allItems에서 동적 계산.
  */
 export function RegisterForm({
   location,
+  locations,
+  allItems,
   parentCandidates,
   onClose,
   onSaved,
   editItem,
 }: RegisterFormProps) {
   const isEdit = editItem !== undefined;
+
+  // 초기 location: 수정 모드면 editItem 소속, 등록 모드면 폼이 열린 location.
+  const [selectedLocationId, setSelectedLocationId] = useState<UUID>(
+    editItem?.location_id ?? location.id,
+  );
 
   // 초기값은 수정 대상이 있으면 그 값으로, 없으면 빈 폼.
   const [name, setName] = useState<string>(editItem?.name ?? "");
@@ -101,22 +112,23 @@ export function RegisterForm({
   }, [file]);
 
   // 이름 trim 후 1..20자일 때만 저장 버튼 활성 (요구 4.8 / Property 6).
-  const nameValid = useMemo(
-    () => validateName(name).ok,
-    [name],
-  );
-
+  const nameValid = useMemo(() => validateName(name).ok, [name]);
   const canSave = nameValid && !submitting;
 
-  // 수정 모드에서는 parent 옵션에서 자기 자신을 제외한다 (자기 참조 방지).
-  // 등록 모드에서는 그대로 노출.
-  const visibleParentCandidates = useMemo(
-    () =>
-      isEdit
-        ? parentCandidates.filter((p) => p.id !== editItem!.id)
-        : parentCandidates,
-    [isEdit, parentCandidates, editItem],
-  );
+  /**
+   * Parent_Item 후보 — selectedLocationId 기준으로 동적 계산.
+   *   - 같은 location의 parent_id=null 항목
+   *   - 자기 자신은 제외 (자기 참조 방지)
+   *
+   * 수정 모드에서 수납장 이동이 발생하면 자동으로 새 location의 후보 목록으로 갱신.
+   * 등록 모드에서는 props.parentCandidates를 사용하지 않고 동일 식으로 일관 처리.
+   */
+  const visibleParentCandidates = useMemo(() => {
+    const list = allItems.filter(
+      (i) => i.parent_id === null && i.location_id === selectedLocationId,
+    );
+    return isEdit ? list.filter((p) => p.id !== editItem!.id) : list;
+  }, [allItems, selectedLocationId, isEdit, editItem]);
 
   // 새 파일이 없고 수정 모드라면 기존 image_url을 미리보기로 사용한다.
   const displayPreviewUrl =
@@ -131,19 +143,24 @@ export function RegisterForm({
     try {
       assertImage(f);
     } catch (err) {
-      // 요구 11.5: 비-이미지 MIME → 메시지 표시 + 파일 상태 폐기.
       setError(
         err instanceof Error
           ? err.message
           : "이미지 파일만 업로드할 수 있습니다",
       );
       setFile(null);
-      // input value를 직접 비워 동일 파일 재선택 시 onChange가 다시 fire되도록.
       e.target.value = "";
       return;
     }
     setError(null);
     setFile(f);
+  };
+
+  const handleLocationChange = (newLocationId: UUID) => {
+    setSelectedLocationId(newLocationId);
+    // 수납장이 바뀌면 기존 parent_id는 다른 location의 parent이므로 무효.
+    // 사용자에게 다시 고르게 강제한다 (요구 9.3 무결성 사전 보장).
+    setParentId(null);
   };
 
   const commitTagDraft = () => {
@@ -153,16 +170,12 @@ export function RegisterForm({
       return;
     }
     if (hashtags.length >= MAX_HASHTAGS) {
-      setError(
-        `해시태그는 최대 ${MAX_HASHTAGS}개까지 입력할 수 있습니다`,
-      );
+      setError(`해시태그는 최대 ${MAX_HASHTAGS}개까지 입력할 수 있습니다`);
       setTagDraft("");
       return;
     }
     if (draft.length > MAX_HASHTAG_LEN) {
-      setError(
-        `해시태그는 각 ${MAX_HASHTAG_LEN}자 이하여야 합니다`,
-      );
+      setError(`해시태그는 각 ${MAX_HASHTAG_LEN}자 이하여야 합니다`);
       return;
     }
     setHashtags((prev) => [...prev, draft]);
@@ -170,9 +183,7 @@ export function RegisterForm({
     setError(null);
   };
 
-  const handleTagKeyDown = (
-    e: React.KeyboardEvent<HTMLInputElement>,
-  ) => {
+  const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" || e.key === ",") {
       e.preventDefault();
       commitTagDraft();
@@ -193,13 +204,12 @@ export function RegisterForm({
     e.preventDefault();
     if (!canSave) return;
 
-    // 1) 클라이언트 검증 — supabase 호출 전 모두 통과해야 한다.
+    // 1) 클라이언트 검증.
     const nameRes = validateName(name);
     if (!nameRes.ok) {
       setError(nameRes.message);
       return;
     }
-    // tagDraft가 남아있으면 commit해서 함께 검증한다.
     const pendingDraft = tagDraft.trim();
     const allTags = pendingDraft ? [...hashtags, pendingDraft] : hashtags;
     const tagsRes = validateHashtags(allTags);
@@ -207,10 +217,11 @@ export function RegisterForm({
       setError(tagsRes.message);
       return;
     }
+    // parent 무결성은 selectedLocationId 기준으로 검증.
     const parentRes = validateParent(
       parentId,
-      parentCandidates,
-      location.id,
+      allItems,
+      selectedLocationId,
     );
     if (!parentRes.ok) {
       setError(parentRes.message);
@@ -221,14 +232,8 @@ export function RegisterForm({
     setError(null);
 
     try {
-      // 2) image_url 결정:
-      //    - 새 파일이 선택된 경우: 리사이즈 + 업로드 → 새 publicUrl (Property 8)
-      //    - 새 파일이 없는 경우:
-      //        · 등록 모드 → null
-      //        · 수정 모드 → 기존 editItem.image_url 보존 (Property 10)
-      let image_url: string | null = isEdit
-        ? editItem!.image_url
-        : null;
+      // 2) image_url 결정.
+      let image_url: string | null = isEdit ? editItem!.image_url : null;
 
       if (file) {
         const blob = await resizeTo300(file);
@@ -255,6 +260,7 @@ export function RegisterForm({
         const { error: updErr } = await supabase
           .from(TABLES.items)
           .update({
+            location_id: selectedLocationId, // 수납장 이동 반영
             name: name.trim(),
             hashtags: cleanedTags,
             image_url,
@@ -263,22 +269,19 @@ export function RegisterForm({
           .eq("id", editItem!.id);
         if (updErr) throw new Error(updErr.message);
       } else {
-        const { error: insErr } = await supabase
-          .from(TABLES.items)
-          .insert({
-            location_id: location.id,
-            name: name.trim(),
-            hashtags: cleanedTags,
-            image_url,
-            parent_id: parentId,
-          });
+        const { error: insErr } = await supabase.from(TABLES.items).insert({
+          location_id: location.id, // 등록은 폼이 열린 location 그대로
+          name: name.trim(),
+          hashtags: cleanedTags,
+          image_url,
+          parent_id: parentId,
+        });
         if (insErr) throw new Error(insErr.message);
       }
 
       onSaved();
       onClose();
     } catch (err) {
-      // 요구 4.11 / 5.6: 폼을 닫지 않고 메시지만 표시. 모드별로 문구를 구분한다.
       console.error("[RegisterForm] save failed:", err);
       setError(isEdit ? "수정에 실패했습니다" : "저장에 실패했습니다");
     } finally {
@@ -287,9 +290,20 @@ export function RegisterForm({
   };
 
   const handleCancel = () => {
-    // 요구 4.10 / Property 9: supabase 호출 없이 즉시 닫기.
     onClose();
   };
+
+  const originalLocation = isEdit
+    ? locations.find((l) => l.id === editItem!.location_id)
+    : null;
+  const targetLocation = locations.find((l) => l.id === selectedLocationId);
+  const locationChanged =
+    isEdit && originalLocation && targetLocation
+      ? originalLocation.id !== targetLocation.id
+      : false;
+
+  // parentCandidates prop은 더 이상 직접 사용하지 않으나 backward-compat 차원에서 보존.
+  void parentCandidates;
 
   return (
     <form className="register-form" onSubmit={handleSave} noValidate>
@@ -369,9 +383,7 @@ export function RegisterForm({
           <img
             src={displayPreviewUrl}
             alt={
-              previewUrl
-                ? "선택한 사진 미리보기"
-                : "기존 사진 미리보기"
+              previewUrl ? "선택한 사진 미리보기" : "기존 사진 미리보기"
             }
             className="register-form__preview"
             width={100}
@@ -400,6 +412,36 @@ export function RegisterForm({
           ))}
         </select>
       </div>
+
+      {/* 수납장 이동 — 수정 모드에서만 노출 (요구 5의 확장: 물품을 다른 수납공간으로 이동) */}
+      {isEdit ? (
+        <div className="register-form__field">
+          <label className="register-form__label" htmlFor="rf-location">
+            수납장 이동
+          </label>
+          <select
+            id="rf-location"
+            className="register-form__input"
+            value={selectedLocationId}
+            onChange={(e) => handleLocationChange(e.target.value)}
+          >
+            {locations.map((l) => (
+              <option key={l.id} value={l.id}>
+                {l.name}
+              </option>
+            ))}
+          </select>
+          {locationChanged && originalLocation && targetLocation ? (
+            <p className="register-form__hint">
+              "{originalLocation.name}" → "{targetLocation.name}" 로 이동
+            </p>
+          ) : (
+            <p className="register-form__hint">
+              현재 위치를 유지하려면 그대로 두세요
+            </p>
+          )}
+        </div>
+      ) : null}
 
       {error ? (
         <p className="register-form__error" role="alert">

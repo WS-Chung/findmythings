@@ -129,6 +129,8 @@ export function App() {
         <ItemPopup
           location={selectedLocation}
           items={itemsForSelected}
+          allItems={allItems}
+          locations={locations}
           itemsError={itemsError}
           onItemsChanged={refetchItems}
           onClose={() => setSelectedLocationId(null)}
