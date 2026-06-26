@@ -1,14 +1,15 @@
 /* ============================================================
- * SearchResultList — 검색바 아래 2열 테이블.
+ * SearchResultList — 검색바 아래 3열 테이블.
  *
  * 레이아웃:
- *   헤더 [물건 | 보관위치]    ← 항상 노출
- *   ─────────────────────────
- *   결과 행 ...
+ *   헤더 [물건 | 보관위치 | 사진]   ← 항상 노출
+ *   ───────────────────────────────
+ *   결과 행 ...                     ← 같은 grid template 공유
  *
- *   헤더와 결과 행이 동일한 grid template를 사용해 컬럼 시작 위치가 정확히 정렬된다.
- *   결과 행: col1 [name] 1.2fr,  col2 [location] 1fr
- *   수납장 이름은 본문보다 1pt 작고 흐린 색으로 위계 표시.
+ *   3컬럼:
+ *     col1 [name]    1.2fr → 물건
+ *     col2 [location] 1fr  → 보관위치 (1pt 작게 + 흐림)
+ *     col3 [photo]   36px  → 📷 (image_url 있는 행만)
  * ============================================================ */
 .search-result-list {
   margin: var(--sp-sm) 0 0;
@@ -21,7 +22,7 @@
 /* 헤더 — 컬럼 명칭 행. 결과 행과 같은 grid template, 1px hairline bottom border. */
 .search-result-list__header {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) 36px;
   gap: var(--sp-xs);
   padding: var(--sp-xs) var(--sp-md);
   border-bottom: 1px solid var(--color-hairline);
@@ -35,6 +36,10 @@
   letter-spacing: 0;
   color: var(--color-ink-muted-48);
   text-transform: none;
+}
+
+.search-result-list__header-cell--photo {
+  text-align: center;
 }
 
 /* 안내 텍스트 (검색 안 함 / 결과 없음) */
@@ -61,9 +66,9 @@
 
 .search-result-list__row {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) 36px;
   gap: var(--sp-xs);
-  align-items: baseline;
+  align-items: center;
   width: 100%;
   padding: var(--sp-sm) var(--sp-md);
   background: transparent;
@@ -105,4 +110,34 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   min-width: 0;
+}
+
+/* 사진 컬럼 컨테이너 — image_url 없는 행에도 빈 채로 자리 유지. */
+.search-result-list__photo-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+/* 사진 아이콘 버튼 — 행 클릭과 분리된 자체 클릭 영역. */
+.search-result-list__photo-btn {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.search-result-list__photo-btn:hover,
+.search-result-list__photo-btn:focus-visible {
+  background: var(--color-canvas-parchment);
+  outline: none;
 }

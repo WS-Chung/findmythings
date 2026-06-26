@@ -18,6 +18,8 @@ export interface SearchPanelProps {
   selectedItemId: UUID | null;
   /** 결과 행 클릭 시 부모로 위임. App이 highlightedLocationId state를 갱신한다. */
   onSelect: (item: Item) => void;
+  /** 사진 아이콘 클릭 시 부모로 위임. App이 ImagePreview 모달을 띄운다. */
+  onPhotoClick: (item: Item) => void;
 }
 
 /**
@@ -33,6 +35,7 @@ export function SearchPanel({
   hasQuery,
   selectedItemId,
   onSelect,
+  onPhotoClick,
 }: SearchPanelProps) {
   return (
     <aside className="search-panel" aria-label="검색 패널">
@@ -42,6 +45,7 @@ export function SearchPanel({
         hasQuery={hasQuery}
         selectedItemId={selectedItemId}
         onSelect={onSelect}
+        onPhotoClick={onPhotoClick}
       />
     </aside>
   );

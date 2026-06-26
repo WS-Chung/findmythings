@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { FloorPlan } from "./components/FloorPlan";
 import { FloorPlanPanel } from "./components/FloorPlanPanel";
+import { ImagePreview } from "./components/ImagePreview";
 import { ItemPopup } from "./components/ItemPopup";
 import { Layout } from "./components/Layout";
 import { Marker } from "./components/Marker";
@@ -44,6 +45,11 @@ export function App() {
    */
   const [highlightedLocationId, setHighlightedLocationId] =
     useState<UUID | null>(null);
+
+  /** 검색 결과의 사진 아이콘 클릭 시 띄울 ImagePreview 대상. */
+  const [searchPreviewItem, setSearchPreviewItem] = useState<Item | null>(
+    null,
+  );
 
   // locations를 id로 빠르게 lookup해 결과 행에 location.name을 붙인다 (요구 7.5).
   const locationById = useMemo(() => {
@@ -125,6 +131,7 @@ export function App() {
         hasQuery={searchHasQuery}
         selectedItemId={selectedSearchItemId}
         onSelect={handleSearchSelect}
+        onPhotoClick={setSearchPreviewItem}
       />
       <FloorPlanPanel error={locationsError}>
         <FloorPlan dimmed={highlightedLocationId !== null}>
@@ -151,6 +158,14 @@ export function App() {
           itemsError={itemsError}
           onItemsChanged={refetchItems}
           onClose={() => setSelectedLocationId(null)}
+        />
+      ) : null}
+
+      {searchPreviewItem && searchPreviewItem.image_url ? (
+        <ImagePreview
+          imageUrl={searchPreviewItem.image_url}
+          alt={searchPreviewItem.name}
+          onClose={() => setSearchPreviewItem(null)}
         />
       ) : null}
     </Layout>
