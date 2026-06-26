@@ -23,17 +23,20 @@ export interface SearchResultListProps {
 /**
  * 검색 결과 리스트 (요구 7.4–7.7).
  *
+ * 레이아웃: 각 행이 2열 grid (이름 / 수납장 이름).
+ *   여러 결과가 떴을 때 물품 이름끼리, 수납장 이름끼리 텍스트 시작 위치가
+ *   세로로 정렬된다. 두 컬럼이 모두 ellipsis 처리되어 넘치는 텍스트는 잘린다.
+ *
  * 표시 규칙:
  *   - active === false                     → 컨테이너 자체를 렌더하지 않는다 (요구 7.6).
  *   - results.length === 0                 → "검색 결과가 없습니다" (요구 7.7)
- *   - results.length > 0                   → 각 행에 item.name + " · " + location.name (요구 7.5)
+ *   - results.length > 0                   → 각 행에 item.name | location.name (요구 7.5)
  *
  * 선택 강조:
  *   - selectedItemId === row.item.id인 행에 `search-result-list__row--selected` 부착.
- *   - 강조는 디자인 토큰만 사용 (primary border + parchment 배경).
+ *   - 강조는 디자인 토큰만 사용 (primary border + canvas 배경).
  *
  * 사진 아이콘 등 다른 정보는 노출하지 않는다 — 명세 7.5는 name과 location.name만 요구한다.
- *
  * 메모리 필터(useSearch) 기반으로 동작하므로 error 분기는 없다.
  */
 export function SearchResultList({
@@ -43,7 +46,6 @@ export function SearchResultList({
   onSelect,
 }: SearchResultListProps) {
   if (!active) {
-    // 요구 7.6: 0자 입력이면 컨테이너 자체가 표시되지 않아야 한다.
     return null;
   }
 
@@ -71,7 +73,6 @@ export function SearchResultList({
               aria-pressed={isSelected}
             >
               <span className="search-result-list__name">{item.name}</span>
-              <span className="search-result-list__sep"> · </span>
               <span className="search-result-list__location">
                 {location?.name ?? "위치 미상"}
               </span>

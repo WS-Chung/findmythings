@@ -70,6 +70,23 @@ export function App() {
     }
   }, [query]);
 
+  /**
+   * 빈 영역(검색 결과 행 외 어디든) 클릭으로도 강조를 해제한다.
+   * 검색 결과 행 자체 클릭은 새 강조를 설정하는 동작이므로 무시한다.
+   * 강조가 활성화된 상태에서만 핸들러를 부착해 불필요한 클릭 이벤트 처리를 막는다.
+   */
+  useEffect(() => {
+    if (highlightedLocationId === null) return;
+    const onDocClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.closest(".search-result-list__row")) return;
+      setHighlightedLocationId(null);
+      setSelectedSearchItemId(null);
+    };
+    document.addEventListener("click", onDocClick);
+    return () => document.removeEventListener("click", onDocClick);
+  }, [highlightedLocationId]);
+
   const handleMarkerClick = (id: UUID) => {
     setSelectedLocationId(id);
   };
