@@ -17,9 +17,14 @@
   display: flex;
   flex-direction: column;
   gap: var(--sp-xxs);
+  /* SearchPanel 내부의 남은 공간을 모두 차지하고, 헤더는 고정 / items만 스크롤 */
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
 }
 
-/* 헤더 — 컬럼 명칭 행. 결과 행과 같은 grid template, 1px hairline bottom border. */
+/* 헤더 — 컬럼 명칭 행. 결과 행과 같은 grid template, 1px hairline bottom border.
+   flex 컨테이너 안에서 자연 높이로 고정 (스크롤되지 않음). */
 .search-result-list__header {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) 36px;
@@ -28,6 +33,7 @@
   border-bottom: 1px solid var(--color-hairline);
   margin-bottom: var(--sp-xxs);
   font-family: var(--font-text);
+  flex: 0 0 auto;
 }
 
 .search-result-list__header-cell {
@@ -54,7 +60,7 @@
   text-align: center;
 }
 
-/* 결과 행 목록 */
+/* 결과 행 목록 — 데이터 영역. 이 영역만 세로 스크롤. */
 .search-result-list__items {
   list-style: none;
   margin: 0;
@@ -62,6 +68,9 @@
   display: flex;
   flex-direction: column;
   gap: var(--sp-xxs);
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .search-result-list__row {
@@ -140,4 +149,16 @@
 .search-result-list__photo-btn:focus-visible {
   background: var(--color-canvas-parchment);
   outline: none;
+}
+
+/* 모바일: SearchPanel이 height: auto이므로 내부 스크롤 컨테이너 해제 — 페이지 스크롤로 흐르게 둔다. */
+@media (max-width: 833px) {
+  .search-result-list {
+    flex: 0 0 auto;
+    overflow: visible;
+  }
+  .search-result-list__items {
+    flex: 0 0 auto;
+    overflow: visible;
+  }
 }
