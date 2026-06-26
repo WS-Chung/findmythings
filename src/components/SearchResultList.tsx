@@ -10,11 +10,13 @@ export interface SearchResultRow {
 export interface SearchResultListProps {
   results: SearchResultRow[];
   /**
-   * 검색이 활성화된 상태인지 여부 (디바운스된 query.trim().length > 0).
-   * 헤더(물건/보관위치)는 active와 무관하게 항상 노출되며, 결과 영역만
-   * active에 따라 분기된다.
+   * 사용자가 검색어를 입력한 상태인지 여부.
+   *   - true  → 검색 모드. 결과 0건이면 "검색 결과가 없습니다"
+   *   - false → 전체 보기 모드. 결과 0건이면 "등록된 물품이 없습니다"
+   *
+   * 헤더(물건/보관위치)는 hasQuery와 무관하게 항상 노출된다.
    */
-  active: boolean;
+  hasQuery: boolean;
   /** 사용자가 선택한 결과 행의 item.id. 선택 시각 강조에 사용. */
   selectedItemId: UUID | null;
   /** 행 클릭 시 부모(App)의 highlight 핸들러로 위임한다 (요구 8.1/8.2). */
@@ -22,26 +24,14 @@ export interface SearchResultListProps {
 }
 
 /**
- * 검색 결과 리스트 — 2열 테이블 형태 (헤더 + 결과 행).
+ * 검색 결과 리스트 — 2열 테이블 (헤더 + 결과 행).
  *
- * 레이아웃: 각 행이 2열 grid (물건 / 보관위치).
- *   헤더와 결과 행이 같은 grid template를 공유하므로 컬럼 시작 위치가 정확히 정렬된다.
- *
- * 표시 규칙:
- *   - 헤더 행 "물건 | 보관위치"는 항상 노출 (검색 안 한 상태에서도 보임).
- *   - 결과 영역:
- *       active === false               → 안내 텍스트 표시
- *       active === true, length === 0  → "검색 결과가 없습니다"
- *       active === true, length > 0    → 각 행에 item.name | location.name (요구 7.5)
- *
- * 선택 강조:
- *   - selectedItemId === row.item.id인 행에 `--selected` modifier 부착.
- *
- * 메모리 필터(useSearch) 기반으로 동작하므로 error 분기는 없다.
+ * 검색어가 없을 때도 전체 items가 가나다 순으로 나열되며 (스크롤 가능),
+ * 검색어가 있을 때는 일치 결과만 보인다. 헤더는 항상 노출.
  */
 export function SearchResultList({
   results,
-  active,
+  hasQuery,
   selectedItemId,
   onSelect,
 }: SearchResultListProps) {
@@ -56,12 +46,10 @@ export function SearchResultList({
         <span className="search-result-list__header-cell">보관위치</span>
       </div>
 
-      {!active ? (
+      {results.length === 0 ? (
         <p className="search-result-list__hint">
-          검색어를 입력하세요
+          {hasQuery ? "검색 결과가 없습니다" : "등록된 물품이 없습니다"}
         </p>
-      ) : results.length === 0 ? (
-        <p className="search-result-list__hint">검색 결과가 없습니다</p>
       ) : (
         <ul className="search-result-list__items" aria-label="검색 결과">
           {results.map(({ item, location }) => {

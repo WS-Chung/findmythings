@@ -25,7 +25,7 @@ export function App() {
 
   // ---- 검색 상태 (Task 9.6) ----
   const [query, setQuery] = useState("");
-  const { data: searchResults, active: searchActive } = useSearch(
+  const { data: searchResults, hasQuery: searchHasQuery } = useSearch(
     query,
     allItems,
   );
@@ -122,7 +122,7 @@ export function App() {
         query={query}
         onQueryChange={setQuery}
         results={enrichedResults}
-        active={searchActive}
+        hasQuery={searchHasQuery}
         selectedItemId={selectedSearchItemId}
         onSelect={handleSearchSelect}
       />
