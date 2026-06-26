@@ -1,6 +1,13 @@
 /* ============================================================
  * Highlight pulse — Marker 강조 애니메이션
- *   주기 2s, 2회 반복 (요구 8.3: 1.5–3s 주기, ≥2회)
+ *   - 크기 변동: 1.0 ↔ 1.375 (이전 1.25에서 진폭 1.5배 확대)
+ *   - 후광 blur: 7.2px (이전 6px에서 20% 증가)
+ *   - 주기 2s, 사용자가 해제할 때까지 무한 반복
+ *
+ * 해제 트리거 (App.tsx에서 처리):
+ *   - 검색바 입력값을 비움
+ *   - 다른 검색 결과 행을 선택해 highlight가 다른 마커로 옮겨감
+ *   - 결과 행 외 빈 영역 클릭 (document click 핸들러)
  * ============================================================ */
 @keyframes pulse {
   0% {
@@ -8,7 +15,7 @@
     opacity: 1;
   }
   50% {
-    transform: translate(-50%, -50%) scale(1.25);
+    transform: translate(-50%, -50%) scale(1.375);
     opacity: 0.7;
   }
   100% {
@@ -18,6 +25,6 @@
 }
 
 .marker--highlight {
-  animation: pulse 2s ease-in-out 2;
-  filter: drop-shadow(0 0 6px var(--color-primary-focus));
+  animation: pulse 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 7.2px var(--color-primary-focus));
 }
