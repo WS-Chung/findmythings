@@ -46,8 +46,27 @@
   padding-left: 0;
 }
 
+/**
+ * Child_Item의 lead 좌측에 폴더 트리 분기를 CSS pseudo-element로 그린다.
+ *   ::before — 부모와 자식을 잇는 ㄴ자 가지 (위에서 내려와 아래에서 우측으로)
+ *   부모 행 위쪽까지 세로선이 이어져 부모-자식 관계가 시각적으로 명확해진다.
+ *   같은 부모 아래 여러 자식이 있어도 각 가지가 독립적으로 그려진다.
+ */
 .item-row--indent-1 .item-row__lead {
-  padding-left: var(--sp-lg);
+  padding-left: 36px;
+  position: relative;
+}
+
+.item-row--indent-1 .item-row__lead::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 0;
+  bottom: 50%;
+  width: 14px;
+  border-left: 1px solid var(--color-ink-muted-48);
+  border-bottom: 1px solid var(--color-ink-muted-48);
+  border-bottom-left-radius: 6px;
 }
 
 .item-row__name {

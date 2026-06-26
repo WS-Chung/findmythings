@@ -11,7 +11,8 @@ export interface SearchResultListProps {
   results: SearchResultRow[];
   /**
    * 검색이 활성화된 상태인지 여부 (디바운스된 query.trim().length > 0).
-   * false이면 컨테이너 자체가 렌더되지 않는다 (요구 7.6).
+   * 헤더(물건/보관위치)는 active와 무관하게 항상 노출되며, 결과 영역만
+   * active에 따라 분기된다.
    */
   active: boolean;
   /** 사용자가 선택한 결과 행의 item.id. 선택 시각 강조에 사용. */
@@ -21,22 +22,21 @@ export interface SearchResultListProps {
 }
 
 /**
- * 검색 결과 리스트 (요구 7.4–7.7).
+ * 검색 결과 리스트 — 2열 테이블 형태 (헤더 + 결과 행).
  *
- * 레이아웃: 각 행이 2열 grid (이름 / 수납장 이름).
- *   여러 결과가 떴을 때 물품 이름끼리, 수납장 이름끼리 텍스트 시작 위치가
- *   세로로 정렬된다. 두 컬럼이 모두 ellipsis 처리되어 넘치는 텍스트는 잘린다.
+ * 레이아웃: 각 행이 2열 grid (물건 / 보관위치).
+ *   헤더와 결과 행이 같은 grid template를 공유하므로 컬럼 시작 위치가 정확히 정렬된다.
  *
  * 표시 규칙:
- *   - active === false                     → 컨테이너 자체를 렌더하지 않는다 (요구 7.6).
- *   - results.length === 0                 → "검색 결과가 없습니다" (요구 7.7)
- *   - results.length > 0                   → 각 행에 item.name | location.name (요구 7.5)
+ *   - 헤더 행 "물건 | 보관위치"는 항상 노출 (검색 안 한 상태에서도 보임).
+ *   - 결과 영역:
+ *       active === false               → 안내 텍스트 표시
+ *       active === true, length === 0  → "검색 결과가 없습니다"
+ *       active === true, length > 0    → 각 행에 item.name | location.name (요구 7.5)
  *
  * 선택 강조:
- *   - selectedItemId === row.item.id인 행에 `search-result-list__row--selected` 부착.
- *   - 강조는 디자인 토큰만 사용 (primary border + canvas 배경).
+ *   - selectedItemId === row.item.id인 행에 `--selected` modifier 부착.
  *
- * 사진 아이콘 등 다른 정보는 노출하지 않는다 — 명세 7.5는 name과 location.name만 요구한다.
  * 메모리 필터(useSearch) 기반으로 동작하므로 error 분기는 없다.
  */
 export function SearchResultList({
@@ -45,41 +45,48 @@ export function SearchResultList({
   selectedItemId,
   onSelect,
 }: SearchResultListProps) {
-  if (!active) {
-    return null;
-  }
-
-  if (results.length === 0) {
-    return (
-      <div className="search-result-list">
-        <p className="search-result-list__hint">검색 결과가 없습니다</p>
-      </div>
-    );
-  }
-
   return (
-    <ul className="search-result-list" aria-label="검색 결과">
-      {results.map(({ item, location }) => {
-        const isSelected = item.id === selectedItemId;
-        const className = isSelected
-          ? "search-result-list__row search-result-list__row--selected"
-          : "search-result-list__row";
-        return (
-          <li key={item.id}>
-            <button
-              type="button"
-              className={className}
-              onClick={() => onSelect(item)}
-              aria-pressed={isSelected}
-            >
-              <span className="search-result-list__name">{item.name}</span>
-              <span className="search-result-list__location">
-                {location?.name ?? "위치 미상"}
-              </span>
-            </button>
-          </li>
-        );
-      })}
-    </ul>
+    <div className="search-result-list">
+      <div
+        className="search-result-list__header"
+        role="row"
+        aria-label="검색 결과 컬럼 헤더"
+      >
+        <span className="search-result-list__header-cell">물건</span>
+        <span className="search-result-list__header-cell">보관위치</span>
+      </div>
+
+      {!active ? (
+        <p className="search-result-list__hint">
+          검색어를 입력하세요
+        </p>
+      ) : results.length === 0 ? (
+        <p className="search-result-list__hint">검색 결과가 없습니다</p>
+      ) : (
+        <ul className="search-result-list__items" aria-label="검색 결과">
+          {results.map(({ item, location }) => {
+            const isSelected = item.id === selectedItemId;
+            const className = isSelected
+              ? "search-result-list__row search-result-list__row--selected"
+              : "search-result-list__row";
+            return (
+              <li key={item.id}>
+                <button
+                  type="button"
+                  className={className}
+                  onClick={() => onSelect(item)}
+                  aria-pressed={isSelected}
+                >
+                  <span className="search-result-list__name">{item.name}</span>
+                  <span className="search-result-list__location">
+                    {location?.name ?? "위치 미상"}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
   );
 }

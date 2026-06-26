@@ -1,17 +1,16 @@
 /* ============================================================
- * SearchResultList — 검색바 아래에 표시되는 리스트.
+ * SearchResultList — 검색바 아래 2열 테이블.
  *
- * 레이아웃 (2열 grid):
- *   col1 [name]     1.2fr → 물품 이름
- *   col2 [location] 1fr   → 수납장 이름 (1pt 작게 + 흐림)
+ * 레이아웃:
+ *   헤더 [물건 | 보관위치]    ← 항상 노출
+ *   ─────────────────────────
+ *   결과 행 ...
  *
- *   각 행이 같은 grid template를 공유하므로 여러 결과가 세로로 정렬된다.
- *
- * 선택된 행은 primary border + canvas 배경으로 강조한다.
- * 두 컬럼 모두 ellipsis 처리.
+ *   헤더와 결과 행이 동일한 grid template를 사용해 컬럼 시작 위치가 정확히 정렬된다.
+ *   결과 행: col1 [name] 1.2fr,  col2 [location] 1fr
+ *   수납장 이름은 본문보다 1pt 작고 흐린 색으로 위계 표시.
  * ============================================================ */
 .search-result-list {
-  list-style: none;
   margin: var(--sp-sm) 0 0;
   padding: 0;
   display: flex;
@@ -19,8 +18,27 @@
   gap: var(--sp-xxs);
 }
 
-/* 안내 텍스트(에러/결과 없음) 컨테이너용 변형. */
-.search-result-list .search-result-list__hint {
+/* 헤더 — 컬럼 명칭 행. 결과 행과 같은 grid template, 1px hairline bottom border. */
+.search-result-list__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: var(--sp-xs);
+  padding: var(--sp-xs) var(--sp-md);
+  border-bottom: 1px solid var(--color-hairline);
+  margin-bottom: var(--sp-xxs);
+  font-family: var(--font-text);
+}
+
+.search-result-list__header-cell {
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--color-ink-muted-48);
+  text-transform: none;
+}
+
+/* 안내 텍스트 (검색 안 함 / 결과 없음) */
+.search-result-list__hint {
   margin: 0;
   padding: var(--sp-sm) var(--sp-md);
   color: var(--color-ink-muted-48);
@@ -29,6 +47,16 @@
   line-height: var(--lh-body);
   letter-spacing: var(--ls-body);
   text-align: center;
+}
+
+/* 결과 행 목록 */
+.search-result-list__items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-xxs);
 }
 
 .search-result-list__row {

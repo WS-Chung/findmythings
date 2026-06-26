@@ -65,9 +65,6 @@ export function PasswordGate({ children }: PasswordGateProps) {
         <h2 id="password-gate-title" className="password-gate__title">
           비밀번호 입력
         </h2>
-        <p className="password-gate__hint">
-          4자리 숫자를 입력해 주세요
-        </p>
         <input
           type="password"
           inputMode="numeric"
