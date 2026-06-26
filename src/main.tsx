@@ -4,6 +4,7 @@ import "./styles/animations.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
+import { PasswordGate } from "./components/PasswordGate";
 
 const rootEl = document.getElementById("root");
 if (!rootEl) {
@@ -12,6 +13,8 @@ if (!rootEl) {
 
 createRoot(rootEl).render(
   <StrictMode>
-    <App />
+    <PasswordGate>
+      <App />
+    </PasswordGate>
   </StrictMode>,
 );

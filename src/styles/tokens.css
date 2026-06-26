@@ -29,11 +29,11 @@
     0 1px 2px rgba(0, 0, 0, 0.04),
     0 6px 18px rgba(0, 0, 0, 0.08);
 
-  /* typography — 한글 가독성용 Pretendard + 헤더 한정 둥근 Gowun Dodum.
-   * - --font-display: 디스플레이 텍스트(ItemPopup 헤더 등)에 둥근 Gowun Dodum 우선,
+  /* typography — 한글 가독성용 Pretendard + 헤더 한정 Noto Sans KR.
+   * - --font-display: 디스플레이 텍스트(ItemPopup 헤더 등)에 Noto Sans KR 우선,
    *   미적용 환경에서는 Pretendard로 fallback
    * - --font-text: 본문/UI 전반은 Pretendard. */
-  --font-display: "Gowun Dodum", "Pretendard Variable", Pretendard, system-ui, -apple-system, sans-serif;
+  --font-display: "Noto Sans KR", "Pretendard Variable", Pretendard, system-ui, -apple-system, sans-serif;
   --font-text: "Pretendard Variable", Pretendard, system-ui, -apple-system, sans-serif;
   --fs-body: 17px;
   --lh-body: 1.47;
