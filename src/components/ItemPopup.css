@@ -1,7 +1,8 @@
 /* ============================================================
  * ItemPopup — 마커 클릭 시 표시되는 모달.
  *   요구 14.5: 1px solid hairline + radius-lg (18px).
- *   백드롭은 반투명 검정, 본체는 canvas 배경.
+ *   백드롭은 반투명 검정 + fade-in, 본체는 canvas 배경 + pop-in.
+ *   폰트는 일반 본문보다 2pt 작게 잡아 정보 밀도를 높였다.
  * ============================================================ */
 .item-popup__backdrop {
   position: fixed;
@@ -12,6 +13,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--sp-lg);
+  animation: fade-in 200ms ease-out;
 }
 
 .item-popup {
@@ -26,6 +28,7 @@
   padding: var(--sp-lg);
   font-family: var(--font-text);
   color: var(--color-ink);
+  animation: pop-in 220ms ease-out;
 }
 
 .item-popup__header {
@@ -39,7 +42,7 @@
 .item-popup__title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: var(--fs-tagline);
+  font-size: 19px; /* 21 → 19 (–2pt) */
   font-weight: 600;
   letter-spacing: 0.231px;
   line-height: 1.19;
@@ -47,8 +50,8 @@
 }
 
 .item-popup__close {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -58,7 +61,7 @@
   border-radius: var(--radius-pill);
   cursor: pointer;
   color: var(--color-ink-muted-48);
-  font-size: 22px;
+  font-size: 20px;
   line-height: 1;
 }
 
@@ -80,7 +83,7 @@
   padding: var(--sp-lg) 0;
   text-align: center;
   color: var(--color-ink-muted-48);
-  font-size: var(--fs-body);
+  font-size: 15px; /* 17 → 15 (–2pt) */
   line-height: var(--lh-body);
   letter-spacing: var(--ls-body);
 }
@@ -97,19 +100,18 @@
   justify-content: flex-end;
 }
 
-/* button-primary 토큰 적용:
- *   bg=primary, color=on-primary, radius=pill, padding 11px vertical.
+/* button-primary 토큰 적용 — 폰트 2pt 축소 + 상하 padding도 축소.
  *   width 120px 고정 — ItemRow의 수정/삭제 합계 폭과 정확히 일치.
  */
 .item-popup__register {
   width: 120px;
-  padding: 11px 0;
+  padding: 8px 0; /* 11 → 8 (상하 축소) */
   background: var(--color-primary);
   color: var(--color-on-primary);
   border: 1px solid var(--color-primary);
   border-radius: var(--radius-pill);
   font-family: var(--font-text);
-  font-size: var(--fs-body);
+  font-size: 15px; /* 17 → 15 (–2pt) */
   letter-spacing: var(--ls-body);
   text-align: center;
   cursor: pointer;

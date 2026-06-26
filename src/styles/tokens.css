@@ -14,6 +14,10 @@
   --color-on-primary: #ffffff;
   --color-ink-muted-48: #7a7a7a;
 
+  /* danger — 삭제/위험 액션 (Apple 시스템 red 톤). */
+  --color-danger: #d4332f;
+  --color-danger-focus: #b8281f;
+
   /**
    * Page background — 종이/시멘트벽 톤의 차분한 회색.
    * BOX(SearchPanel/FloorPlan)는 흰색이고, 이 배경 위에 살짝 떠 있는 듯한 입체감을

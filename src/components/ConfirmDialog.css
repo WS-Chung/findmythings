@@ -12,6 +12,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--sp-lg);
+  animation: fade-in 200ms ease-out;
 }
 
 .confirm-dialog {
@@ -26,6 +27,7 @@
   padding: var(--sp-lg);
   font-family: var(--font-text);
   color: var(--color-ink);
+  animation: pop-in 220ms ease-out;
 }
 
 .confirm-dialog__message {
@@ -107,15 +109,15 @@
   border-color: var(--color-hairline);
 }
 
-/* 위험 강조(danger=true): ink 배경 + on-primary 텍스트. */
+/* 위험 강조(danger=true): --color-danger 배경 + on-primary 텍스트. */
 .confirm-dialog__confirm--danger {
-  background: var(--color-ink);
-  border-color: var(--color-ink);
+  background: var(--color-danger);
+  border-color: var(--color-danger);
   color: var(--color-on-primary);
 }
 
 .confirm-dialog__confirm--danger:hover:not(:disabled),
 .confirm-dialog__confirm--danger:focus-visible:not(:disabled) {
-  background: var(--color-ink-muted-48);
-  border-color: var(--color-ink-muted-48);
+  background: var(--color-danger-focus);
+  border-color: var(--color-danger-focus);
 }

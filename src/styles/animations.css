@@ -3,11 +3,6 @@
  *   - 크기 변동: 1.0 ↔ 1.375 (이전 1.25에서 진폭 1.5배 확대)
  *   - 후광 blur: 7.2px (이전 6px에서 20% 증가)
  *   - 주기 2s, 사용자가 해제할 때까지 무한 반복
- *
- * 해제 트리거 (App.tsx에서 처리):
- *   - 검색바 입력값을 비움
- *   - 다른 검색 결과 행을 선택해 highlight가 다른 마커로 옮겨감
- *   - 결과 행 외 빈 영역 클릭 (document click 핸들러)
  * ============================================================ */
 @keyframes pulse {
   0% {
@@ -27,4 +22,30 @@
 .marker--highlight {
   animation: pulse 2s ease-in-out infinite;
   filter: drop-shadow(0 0 7.2px var(--color-primary-focus));
+}
+
+/* ============================================================
+ * Fade-in — 팝업/모달/잠금 게이트의 마운트 시 부드러운 등장.
+ *   각 컴포넌트의 backdrop CSS에서 animation 속성으로 참조한다.
+ *   (unmount fade-out은 React Transition Group 없이는 까다로워 일단 mount만 처리.)
+ * ============================================================ */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 살짝 떠오르며 등장 — 모달 본체에 사용 (backdrop에는 fade-in만). */
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }

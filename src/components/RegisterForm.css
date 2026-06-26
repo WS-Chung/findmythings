@@ -9,6 +9,8 @@
   gap: var(--sp-md);
   font-family: var(--font-text);
   color: var(--color-ink);
+  /* ItemPopup의 list ↔ form 전환을 자연스럽게. */
+  animation: fade-in 180ms ease-out;
 }
 
 .register-form__field {

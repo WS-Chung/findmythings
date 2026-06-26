@@ -11,6 +11,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--sp-lg);
+  animation: fade-in 200ms ease-out;
 }
 
 .image-preview {
@@ -19,6 +20,7 @@
   border: 1px solid var(--color-hairline);
   border-radius: var(--radius-lg);
   padding: var(--sp-md);
+  animation: pop-in 220ms ease-out;
 }
 
 .image-preview__close {
