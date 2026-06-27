@@ -26,11 +26,12 @@ export interface ItemRowProps {
  * Item_Popup의 한 행.
  *
  * 레이아웃: CSS grid 3컬럼.
- *   [lead: chevron? + 이름 + 사진]  [해시태그]  [수정/삭제]
+ *   [lead: 이름 + chevron? + 사진]  [해시태그]  [수정/삭제]
  *
  * - 각 컬럼의 폭이 고정되어 있어 이름 길이가 달라도 세 영역이 좌우로 정렬된다.
  *   이름이 컬럼 폭을 넘으면 ellipsis 처리.
- * - 들여쓰기는 lead 컬럼 안의 padding-left로 처리해 grid 정렬을 깨지 않는다.
+ * - 모든 행의 이름 텍스트는 lead 좌측 끝을 기준으로 정렬된다 (자식 행도 들여쓰기 없이 동일 정렬).
+ *   부모/자식의 시각 위계는 폰트 굵기/크기/색 차이로만 표현한다.
  * - 해시태그가 없는 행에는 빈 placeholder를 렌더링해 grid cell 자리를 유지한다.
  * - 사진 아이콘(📷)은 `item.image_url`이 truthy일 때만 노출 (요구 2.5, 2.6).
  * - 자식이 있는 부모 행은 이름이 button으로 렌더되어 클릭 시 자식 영역을 접고 편다.
@@ -76,6 +77,7 @@ export function ItemRow({
             aria-expanded={!collapsed}
             aria-label={collapsed ? "하위 물품 펼치기" : "하위 물품 접기"}
           >
+            <span className="item-row__name">{item.name}</span>
             <span
               className={
                 collapsed
@@ -86,7 +88,6 @@ export function ItemRow({
             >
               ▸
             </span>
-            <span className="item-row__name">{item.name}</span>
           </button>
         ) : (
           <span className="item-row__name">{item.name}</span>
