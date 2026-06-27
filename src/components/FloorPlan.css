@@ -9,8 +9,8 @@
  *
  * 강조 모드(.floorplan--dimmed):
  *   - 검색 결과 행이 선택되어 highlightedLocationId가 set된 동안 활성화
- *   - 도면 배경(background.png)은 변동 없이 그대로 보인다
- *   - 강조되지 않은 다른 마커들만 흐릿하게 처리해 강조 마커를 부각
+ *   - 도면 배경(background.png)이 0.7 → 0.55로 부드럽게 페이드 (15% 더 투명)
+ *   - 강조되지 않은 다른 마커들도 흐릿하게 처리해 강조 마커를 부각
  * ============================================================ */
 .floorplan {
   position: relative;
@@ -33,7 +33,13 @@
   background-repeat: no-repeat;
   opacity: 0.7;
   pointer-events: none;
-  /* 강조 모드에서도 변동 없음 (transition은 향후 필요 시 추가). */
+  /* 강조 모드 진입/해제 시 부드러운 페이드. */
+  transition: opacity 0.3s ease;
+}
+
+/* 강조 모드: 도면 배경을 15% 더 투명하게 (0.7 → 0.55). */
+.floorplan--dimmed .floorplan__bg {
+  opacity: 0.55;
 }
 
 .floorplan__layer {

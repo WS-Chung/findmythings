@@ -1,27 +1,27 @@
 /* ============================================================
  * Highlight pulse — Marker 강조 애니메이션
- *   - 크기 변동: 1.0 ↔ 1.72 (최대 크기 +25%)
- *   - 후광 blur: 10.8px (이전 7.2px에서 +50%)
+ *   - 크기 변동: 1.0 ↔ 1.72 (커질 때도 불투명도는 유지)
+ *   - 후광 blur: 10.8px, drop-shadow를 2번 스택해 푸른 빛을 1.5배 진하게
  *   - 주기 2s, 사용자가 해제할 때까지 무한 반복
  * ============================================================ */
 @keyframes pulse {
   0% {
     transform: translate(-50%, -50%) scale(1);
-    opacity: 1;
   }
   50% {
     transform: translate(-50%, -50%) scale(1.72);
-    opacity: 0.7;
   }
   100% {
     transform: translate(-50%, -50%) scale(1);
-    opacity: 1;
   }
 }
 
 .marker--highlight {
   animation: pulse 2s ease-in-out infinite;
-  filter: drop-shadow(0 0 10.8px var(--color-primary-focus));
+  /* drop-shadow 2회 스택 — 푸른빛이 약 1.5배 더 진하게 보이도록 두 번째는 좁은 blur로 더한다. */
+  filter:
+    drop-shadow(0 0 10.8px var(--color-primary-focus))
+    drop-shadow(0 0 6px var(--color-primary-focus));
 }
 
 /* ============================================================

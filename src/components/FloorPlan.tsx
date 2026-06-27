@@ -9,9 +9,9 @@ export interface FloorPlanProps {
    */
   children: (wrapperWidth: number) => ReactNode;
   /**
-   * true이면 배경 도면(background.png)을 어둡고 흐리게(`opacity: 0.25 + blur(2px)`)
-   * 처리하여 강조 중인 마커의 펄스 애니메이션이 더 두드러져 보이게 한다.
-   * 마커 자체에는 영향을 주지 않는다.
+   * true이면 배경 도면(background.png)이 부드러운 페이드와 함께 더 투명해지고
+   * 비강조 마커도 흐릿하게 처리되어, 강조 중인 마커의 펄스가 더 두드러져 보인다.
+   * 강조 마커 자체의 불투명도에는 영향을 주지 않는다.
    */
   dimmed?: boolean;
 }
@@ -24,7 +24,7 @@ export interface FloorPlanProps {
  *   - 마운트 시 ResizeObserver로 wrapper 폭을 측정 → state로 노출
  *   - 부모 폭이 변하면 ResizeObserver 콜백이 fire되어 마커 좌표가 실시간 재계산
  *   - unmount 시 observer.disconnect()로 정리
- *   - `dimmed`이 truthy면 `.floorplan--dimmed` 클래스 부착 → 배경만 어두워진다
+ *   - `dimmed`이 truthy면 `.floorplan--dimmed` 클래스 부착 → 배경이 페이드하며 더 투명해진다
  */
 export function FloorPlan({ children, dimmed = false }: FloorPlanProps) {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
