@@ -37,9 +37,9 @@
   transition: opacity 0.3s ease;
 }
 
-/* 강조 모드: 도면 배경을 15% 더 투명하게 (0.7 → 0.55). */
+/* 강조 모드: 도면 배경을 더 투명하게 (0.7 → 0.45) — 마커 강조를 부각. */
 .floorplan--dimmed .floorplan__bg {
-  opacity: 0.55;
+  opacity: 0.45;
 }
 
 .floorplan__layer {

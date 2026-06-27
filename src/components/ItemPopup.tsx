@@ -70,12 +70,54 @@ export function ItemPopup({
   const [editingItem, setEditingItem] = useState<Item | null>(null);
   const [deletingItem, setDeletingItem] = useState<Item | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  /**
+   * 현재 접힌 Parent_Item id 집합. 기본값은 "자식이 있는 모든 부모"로,
+   * 마커 클릭 직후에는 최상위 항목만 보이는 상태가 된다.
+   * items가 변하면(refetch 후) 같은 규칙으로 재설정한다.
+   */
+  const [collapsedParents, setCollapsedParents] = useState<Set<string>>(
+    () => new Set(),
+  );
 
   // 부모/자식 트리화 + parent 후보 목록은 데이터가 바뀔 때만 다시 계산한다.
   const tree = useMemo(() => buildItemTree(items), [items]);
   const parentCandidates = useMemo(
     () => items.filter((i) => i.parent_id === null),
     [items],
+  );
+
+  // tree가 갱신될 때마다 "자식 있는 부모"를 모두 접힌 상태로 리셋한다.
+  useEffect(() => {
+    const next = new Set<string>();
+    for (const row of tree) {
+      if (row.indent === 0 && row.hasChildren) {
+        next.add(row.item.id);
+      }
+    }
+    setCollapsedParents(next);
+  }, [tree]);
+
+  const handleToggleParent = (item: Item) => {
+    setCollapsedParents((prev) => {
+      const next = new Set(prev);
+      if (next.has(item.id)) next.delete(item.id);
+      else next.add(item.id);
+      return next;
+    });
+  };
+
+  /**
+   * collapsed=true인 부모 아래의 자식 행(indent=1)을 숨겨 렌더한다.
+   * 자식의 부모는 item.parent_id로 식별되므로 추가 인덱스는 불필요.
+   */
+  const visibleTree = useMemo(
+    () =>
+      tree.filter((row) => {
+        if (row.indent === 0) return true;
+        const pid = row.item.parent_id;
+        return pid === null || !collapsedParents.has(pid);
+      }),
+    [tree, collapsedParents],
   );
 
   // Esc 키 우선순위 (요구 2.8, 6.5).
@@ -224,16 +266,24 @@ export function ItemPopup({
             <p className="item-popup__hint">등록된 물품이 없습니다</p>
           ) : (
             <ul className="item-popup__list">
-              {tree.map(({ item, indent }) => (
-                <ItemRow
-                  key={item.id}
-                  item={item}
-                  indent={indent}
-                  onPhotoClick={setPreviewItem}
-                  onEdit={handleEditClick}
-                  onDelete={handleDeleteClick}
-                />
-              ))}
+              {visibleTree.map(({ item, indent, hasChildren }) => {
+                const collapsible = indent === 0 && Boolean(hasChildren);
+                return (
+                  <ItemRow
+                    key={item.id}
+                    item={item}
+                    indent={indent}
+                    collapsible={collapsible}
+                    collapsed={
+                      collapsible ? collapsedParents.has(item.id) : false
+                    }
+                    onToggle={collapsible ? handleToggleParent : undefined}
+                    onPhotoClick={setPreviewItem}
+                    onEdit={handleEditClick}
+                    onDelete={handleDeleteClick}
+                  />
+                );
+              })}
             </ul>
           )}
         </div>

@@ -19,7 +19,7 @@ describe("buildItemTree", () => {
     expect(buildItemTree([])).toEqual([]);
   });
 
-  it("places parents (indent=0) before their children (indent=1)", () => {
+  it("places parents (indent=0) before their children (indent=1) and flags hasChildren", () => {
     const p1 = makeItem({ id: "p1", name: "Parent 1" });
     const c1 = makeItem({ id: "c1", parent_id: "p1", name: "Child 1" });
     const p2 = makeItem({ id: "p2", name: "Parent 2" });
@@ -29,11 +29,17 @@ describe("buildItemTree", () => {
     const tree = buildItemTree([p1, p2, c1, c2]);
 
     expect(tree).toEqual([
-      { item: p1, indent: 0 },
+      { item: p1, indent: 0, hasChildren: true },
       { item: c1, indent: 1 },
-      { item: p2, indent: 0 },
+      { item: p2, indent: 0, hasChildren: true },
       { item: c2, indent: 1 },
     ]);
+  });
+
+  it("marks parents without children as hasChildren=false", () => {
+    const p1 = makeItem({ id: "p1", name: "Lonely" });
+    const tree = buildItemTree([p1]);
+    expect(tree).toEqual([{ item: p1, indent: 0, hasChildren: false }]);
   });
 
   it("appends orphan children (whose parent is missing) at the end with indent=1", () => {
@@ -43,7 +49,7 @@ describe("buildItemTree", () => {
     const tree = buildItemTree([p1, orphan]);
 
     expect(tree).toEqual([
-      { item: p1, indent: 0 },
+      { item: p1, indent: 0, hasChildren: false },
       { item: orphan, indent: 1 },
     ]);
   });

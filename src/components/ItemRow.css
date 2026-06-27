@@ -77,6 +77,46 @@
   white-space: nowrap;
 }
 
+/* 토글 버튼 — 자식이 있는 부모 행에서 이름을 감싼다.
+   클릭 가능한 영역은 chevron + 이름 텍스트 전체. */
+.item-row__toggle {
+  flex: 1 1 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.item-row__toggle:focus-visible {
+  outline: 1px dashed var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* chevron — ▸ 한 글자를 rotate transition으로 ▾처럼 회전시켜 부드럽게 전환. */
+.item-row__chevron {
+  flex: 0 0 auto;
+  display: inline-block;
+  width: 12px;
+  text-align: center;
+  font-size: 11px;
+  line-height: 1;
+  color: var(--color-ink-muted-48);
+  transition: transform 0.18s ease;
+  transform-origin: 50% 50%;
+}
+
+.item-row__chevron--expanded {
+  transform: rotate(90deg);
+}
+
 /* 상/하위 시각 구분 ─ 이름 부분에만. 폰트 2pt 축소 적용. */
 .item-row--indent-0 .item-row__name {
   font-weight: 600;

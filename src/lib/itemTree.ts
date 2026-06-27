@@ -4,6 +4,8 @@ export interface TreeRow {
   item: Item;
   /** 0 = Parent_Item (parent_id IS NULL), 1 = Child_Item (들여쓰기) */
   indent: number;
+  /** indent=0일 때만 의미 있음. 해당 Parent_Item이 자식을 가지는지 여부. */
+  hasChildren?: boolean;
 }
 
 /**
@@ -16,14 +18,16 @@ export interface TreeRow {
  *
  * 안정 정렬: filter는 input 순서를 보존하므로 useItems가 (parent_id NULLS FIRST, created_at ASC)로
  * 정렬된 배열을 넘겨주면 결과 트리도 created_at ASC 순이 된다.
+ *
+ * 부모 행에는 `hasChildren`을 함께 실어 ItemPopup이 토글 컨트롤을 표시할지 결정할 수 있게 한다.
  */
 export function buildItemTree(items: Item[]): TreeRow[] {
   const parents = items.filter((i) => i.parent_id === null);
   const result: TreeRow[] = [];
 
   for (const p of parents) {
-    result.push({ item: p, indent: 0 });
     const children = items.filter((i) => i.parent_id === p.id);
+    result.push({ item: p, indent: 0, hasChildren: children.length > 0 });
     for (const c of children) {
       result.push({ item: c, indent: 1 });
     }
