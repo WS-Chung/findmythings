@@ -1,0 +1,35 @@
+/* ============================================================
+ * FloorPlanPanel — 우측 패널.
+ *   데스크탑: flex item으로 남은 폭 모두 차지 (≈ 56vw, 도면 1.15배 확대 효과)
+ *   모바일: 단일 컬럼 모드에서 너비 100%
+ *   <FloorPlan>을 그대로 보유하거나, locations fetch가 실패하면
+ *   안내 텍스트를 표시한다.
+ * ============================================================ */
+.floorplan-panel {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-text);
+  color: var(--color-ink);
+  /* 도면 박스가 column 폭 100%를 차지하므로 자체 padding은 두지 않는다. */
+}
+
+.floorplan-panel__error {
+  padding: var(--sp-lg);
+  text-align: center;
+  color: var(--color-ink-muted-48);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  letter-spacing: var(--ls-body);
+  border: 2px solid var(--color-hairline);
+  border-radius: var(--radius-lg);
+  background: var(--color-canvas);
+  box-shadow: var(--shadow-elevated);
+  margin-top: 30px;
+}
+
+@media (max-width: 833px) {
+  .floorplan-panel {
+    width: 100%;
+  }
+}

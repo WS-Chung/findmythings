@@ -1,0 +1,32 @@
+/* ============================================================
+ * Layout — 컨텐츠 영역 가로 중앙 정렬.
+ *
+ * 데스크탑 (≥ 834px):
+ *   - 폭: 24vw(검색) + 20px(gap) + 56vw(도면) = calc(80vw + 20px)
+ *   - 가운데 정렬, 좌우 여백 동일
+ *   - flex로 두 BOX를 나란히 배치하고 gap: 20px로만 사이를 띄움
+ *   - align-items: stretch → 두 BOX의 박스 높이가 자동으로 일치 (도면이 결정)
+ *
+ * 모바일/태블릿 포트레이트 (≤ 833px):
+ *   - 단일 컬럼, 95vw 폭
+ *   - SearchPanel이 위, FloorPlanPanel이 아래 (DOM 순서 그대로)
+ *   - 두 BOX 사이 vertical gap은 spacing 토큰으로 호흡 확보
+ * ============================================================ */
+.layout {
+  width: calc(80vw + 20px);
+  margin: 0 auto;
+  min-height: 100vh;
+  padding: var(--sp-lg) 0;
+  display: flex;
+  gap: 20px;
+  align-items: stretch;
+}
+
+@media (max-width: 833px) {
+  .layout {
+    flex-direction: column;
+    width: 95vw;
+    gap: var(--sp-lg);
+    align-items: stretch;
+  }
+}

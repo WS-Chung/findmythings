@@ -1,0 +1,81 @@
+/* ============================================================
+ * Design Tokens — Apple style
+ *   Apple 스타일을 참고해 만든 Find My Things 전용 토큰.
+ *   모든 컴포넌트는 :root CSS 변수만 참조합니다.
+ * ============================================================ */
+:root {
+  /* colors */
+  --color-primary: #0066cc;
+  --color-primary-focus: #0071e3;
+  --color-ink: #1d1d1f;
+  --color-canvas: #ffffff;
+  --color-canvas-parchment: #f5f5f7;
+  --color-hairline: #e0e0e0;
+  --color-on-primary: #ffffff;
+  --color-ink-muted-48: #7a7a7a;
+
+  /* danger — 삭제/위험 액션 (Apple 시스템 red 톤). */
+  --color-danger: #d4332f;
+  --color-danger-focus: #b8281f;
+
+  /**
+   * Page background — 종이/시멘트벽 톤의 차분한 회색.
+   * BOX(SearchPanel/FloorPlan)는 흰색이고, 이 배경 위에 살짝 떠 있는 듯한 입체감을
+   * shadow-elevated와 조합해 표현한다.
+   */
+  --color-surface-page: #e8e8ec;
+
+  /**
+   * Elevated surface shadow — BOX 컨테이너를 종이톤 배경에서 띄워 보이게 한다.
+   * Apple style의 product-shadow보다 약하게 적용해 미니멀함을 유지한다.
+   */
+  --shadow-elevated:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 6px 18px rgba(0, 0, 0, 0.08);
+
+  /* typography — 한글 가독성용 Pretendard + 헤더 한정 Noto Sans KR.
+   * - --font-display: 디스플레이 텍스트(ItemPopup 헤더 등)에 Noto Sans KR 우선,
+   *   미적용 환경에서는 Pretendard로 fallback
+   * - --font-text: 본문/UI 전반은 Pretendard. */
+  --font-display: "Noto Sans KR", "Pretendard Variable", Pretendard, system-ui, -apple-system, sans-serif;
+  --font-text: "Pretendard Variable", Pretendard, system-ui, -apple-system, sans-serif;
+  --fs-body: 17px;
+  --lh-body: 1.47;
+  --ls-body: -0.374px;
+  --fs-tagline: 21px;
+  --fs-caption: 14px;
+
+  /* radii */
+  --radius-sm: 8px;
+  --radius-md: 11px;
+  --radius-lg: 18px;
+  --radius-pill: 9999px;
+
+  /* spacing */
+  --sp-xxs: 4px;
+  --sp-xs: 8px;
+  --sp-sm: 12px;
+  --sp-md: 17px;
+  --sp-lg: 24px;
+  --sp-xl: 32px;
+  --sp-xxl: 48px;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  background: var(--color-surface-page);
+  color: var(--color-ink);
+  font-family: var(--font-text);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  letter-spacing: var(--ls-body);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}

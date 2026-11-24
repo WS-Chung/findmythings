@@ -1,0 +1,8 @@
+# 저장소에는 LF로 저장하고, 체크아웃 시에는 OS 기본값(Windows = CRLF)을 따른다.
+* text=auto
+
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.webp binary
+*.ico  binary

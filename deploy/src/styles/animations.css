@@ -1,0 +1,51 @@
+/* ============================================================
+ * Highlight pulse — Marker 강조 애니메이션
+ *   - 크기 변동: 1.0 ↔ 1.72 (커질 때도 불투명도는 유지)
+ *   - 후광 blur: 10.8px, drop-shadow를 2번 스택해 푸른 빛을 1.5배 진하게
+ *   - 주기 2s, 사용자가 해제할 때까지 무한 반복
+ * ============================================================ */
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.72);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.marker--highlight {
+  animation: pulse 2s ease-in-out infinite;
+  /* drop-shadow 2회 스택 — 푸른빛이 약 1.5배 더 진하게 보이도록 두 번째는 좁은 blur로 더한다. */
+  filter:
+    drop-shadow(0 0 10.8px var(--color-primary-focus))
+    drop-shadow(0 0 6px var(--color-primary-focus));
+}
+
+/* ============================================================
+ * Fade-in — 팝업/모달/잠금 게이트의 마운트 시 부드러운 등장.
+ *   각 컴포넌트의 backdrop CSS에서 animation 속성으로 참조한다.
+ *   (unmount fade-out은 React Transition Group 없이는 까다로워 일단 mount만 처리.)
+ * ============================================================ */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 살짝 떠오르며 등장 — 모달 본체에 사용 (backdrop에는 fade-in만). */
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

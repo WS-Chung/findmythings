@@ -1,0 +1,172 @@
+import { useEffect, useMemo, useState } from "react";
+import { FloorPlan } from "./components/FloorPlan";
+import { FloorPlanPanel } from "./components/FloorPlanPanel";
+import { ImagePreview } from "./components/ImagePreview";
+import { ItemPopup } from "./components/ItemPopup";
+import { Layout } from "./components/Layout";
+import { Marker } from "./components/Marker";
+import { SearchPanel } from "./components/SearchPanel";
+import type { SearchResultRow } from "./components/SearchResultList";
+import { useAllItems } from "./hooks/useAllItems";
+import { useLocations } from "./hooks/useLocations";
+import { useSearch } from "./hooks/useSearch";
+import type { Item, Location, UUID } from "./types/db";
+
+export function App() {
+  const { data: locations, error: locationsError } = useLocations();
+  const {
+    data: allItems,
+    error: itemsError,
+    refetch: refetchItems,
+  } = useAllItems();
+
+  const [selectedLocationId, setSelectedLocationId] = useState<UUID | null>(
+    null,
+  );
+
+  // ---- 검색 상태 ----
+  const [query, setQuery] = useState("");
+  const { data: searchResults, hasQuery: searchHasQuery } = useSearch(
+    query,
+    allItems,
+  );
+
+  /**
+   * 검색 결과에서 클릭된 행의 item.id.
+   * 결과 리스트의 선택 강조와 평면도 마커 highlight를 모두 이 값으로 동기화한다.
+   */
+  const [selectedSearchItemId, setSelectedSearchItemId] = useState<UUID | null>(
+    null,
+  );
+  /**
+   * 현재 펄스 애니메이션이 적용된 location.id. App state가 단일 값이므로
+   * 강조 마커는 항상 0~1개이고, 다른 행을 클릭하면 이전 강조가 자동으로 해제된다.
+   */
+  const [highlightedLocationId, setHighlightedLocationId] =
+    useState<UUID | null>(null);
+
+  /** 검색 결과의 사진 아이콘 클릭 시 띄울 ImagePreview 대상. */
+  const [searchPreviewItem, setSearchPreviewItem] = useState<Item | null>(
+    null,
+  );
+
+  // locations를 id로 빠르게 lookup해 결과 행에 location.name을 붙인다.
+  const locationById = useMemo(() => {
+    const m = new Map<UUID, Location>();
+    for (const l of locations) m.set(l.id, l);
+    return m;
+  }, [locations]);
+
+  const enrichedResults: SearchResultRow[] = useMemo(
+    () =>
+      searchResults.map((item) => ({
+        item,
+        location: locationById.get(item.location_id),
+      })),
+    [searchResults, locationById],
+  );
+
+  // 검색바가 0자가 되면 highlight와 선택 상태를 모두 해제한다.
+  // debounced가 아니라 raw query를 사용해, 사용자가 입력을 비우는 순간 즉시 해제된다.
+  useEffect(() => {
+    if (query.trim().length === 0) {
+      setHighlightedLocationId(null);
+      setSelectedSearchItemId(null);
+    }
+  }, [query]);
+
+  /**
+   * 빈 영역(검색 결과 행 외 어디든) 클릭으로도 강조를 해제한다.
+   * 검색 결과 행 자체 클릭은 새 강조를 설정하는 동작이므로 무시한다.
+   * 강조가 활성화된 상태에서만 핸들러를 부착해 불필요한 클릭 이벤트 처리를 막는다.
+   */
+  useEffect(() => {
+    if (highlightedLocationId === null) return;
+    const onDocClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.closest(".search-result-list__row")) return;
+      setHighlightedLocationId(null);
+      setSelectedSearchItemId(null);
+    };
+    document.addEventListener("click", onDocClick);
+    return () => document.removeEventListener("click", onDocClick);
+  }, [highlightedLocationId]);
+
+  const handleMarkerClick = (id: UUID) => {
+    setSelectedLocationId(id);
+  };
+
+  /**
+   * 검색 결과 행 클릭.
+   * 단일 state 갱신으로 이전 highlight는 자동 해제되고 새 마커에만 펄스가 부여된다.
+   * ItemPopup은 자동으로 열지 않는다 — 사용자가 강조된 마커를 직접
+   * 클릭해 상세를 연다.
+   */
+  const handleSearchSelect = (item: Item) => {
+    setSelectedSearchItemId(item.id);
+    setHighlightedLocationId(item.location_id);
+  };
+
+  const selectedLocation =
+    selectedLocationId !== null
+      ? locations.find((l) => l.id === selectedLocationId) ?? null
+      : null;
+
+  // 선택된 location의 items만 ItemPopup에 전달 (전체 prefetch + 클라이언트 필터).
+  const itemsForSelected = useMemo(
+    () =>
+      selectedLocationId !== null
+        ? allItems.filter((i) => i.location_id === selectedLocationId)
+        : [],
+    [allItems, selectedLocationId],
+  );
+
+  return (
+    <Layout>
+      <SearchPanel
+        query={query}
+        onQueryChange={setQuery}
+        results={enrichedResults}
+        hasQuery={searchHasQuery}
+        selectedItemId={selectedSearchItemId}
+        onSelect={handleSearchSelect}
+        onPhotoClick={setSearchPreviewItem}
+      />
+      <FloorPlanPanel error={locationsError}>
+        <FloorPlan dimmed={highlightedLocationId !== null}>
+          {(wrapperWidth) =>
+            locations.map((loc) => (
+              <Marker
+                key={loc.id}
+                location={loc}
+                wrapperWidth={wrapperWidth}
+                highlighted={loc.id === highlightedLocationId}
+                onClick={handleMarkerClick}
+              />
+            ))
+          }
+        </FloorPlan>
+      </FloorPlanPanel>
+
+      {selectedLocation ? (
+        <ItemPopup
+          location={selectedLocation}
+          items={itemsForSelected}
+          allItems={allItems}
+          locations={locations}
+          itemsError={itemsError}
+          onItemsChanged={refetchItems}
+          onClose={() => setSelectedLocationId(null)}
+        />
+      ) : null}
+
+      {searchPreviewItem && searchPreviewItem.image_url ? (
+        <ImagePreview
+          imageUrl={searchPreviewItem.image_url}
+          alt={searchPreviewItem.name}
+          onClose={() => setSearchPreviewItem(null)}
+        />
+      ) : null}
+    </Layout>
+  );
+}

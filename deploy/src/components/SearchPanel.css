@@ -1,0 +1,42 @@
+/* ============================================================
+ * SearchPanel — 좌측 패널.
+ *   - 데스크탑: flex item으로 24vw 고정 폭 (요구 — 폭 유지)
+ *   - 데스크탑: 외곽 박스 height를 도면 박스 height와 정확히 일치시키기 위해
+ *     `calc(56vw * 740 / 1060)`로 하드코딩한다.
+ *     도면 폭 = 56vw, 종횡비 1060:740, aspect-ratio는 border-box 기준이므로
+ *     외곽 박스 높이도 같은 식으로 계산된다 → 두 외곽 box 정확히 일치.
+ *   - 모바일: 단일 컬럼 모드에서 너비 100%, height: auto로 풀어준다.
+ *   - 종이톤 페이지 배경에서 떠 보이도록 흰 배경 + 2px 테두리 + shadow
+ *   - margin-top 30px 로 FloorPlan과 동일한 상단 위치에서 시작
+ *   - 내부는 SearchInput + SearchResultList를 세로로 배치
+ *   - SearchInput과 결과 헤더는 고정, 결과 행 영역만 스크롤되도록 외곽 overflow는 hidden
+ * ============================================================ */
+.search-panel {
+  flex: 0 0 24vw;
+  height: calc(56vw * 740 / 1060);
+  margin-top: 30px;
+  background: var(--color-canvas);
+  border: 2px solid var(--color-hairline);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-elevated);
+  padding: var(--sp-lg);
+  font-family: var(--font-text);
+  color: var(--color-ink);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-md);
+  /* 외곽은 잠그고 내부 데이터 영역(.search-result-list__items)만 스크롤한다. */
+  overflow: hidden;
+  min-height: 0;
+}
+
+@media (max-width: 833px) {
+  .search-panel {
+    flex: 1 1 auto;
+    width: 100%;
+    height: auto;
+    min-height: 200px;
+    /* 모바일은 페이지 전체가 스크롤 — 패널 내부 스크롤은 풀어준다. */
+    overflow: visible;
+  }
+}
