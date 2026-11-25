@@ -1,0 +1,272 @@
+/* ============================================================
+ * 엑셀형 표 (data-sheet)
+ *   맑은 고딕 13px, 행 24px, 격자선 1px --grid. 열 문자 행·행 번호 열은 --frame 띠.
+ *   이 표만 머리글 띠를 쓴다. 선택 칸은 2px 네이비 외곽선, 선택 행·열 머리는 --active.
+ *   부모 높이를 100% 채운다. 휴대폰에서는 행을 40px로 키운다.
+ * ============================================================ */
+.xg {
+  --xg-row-h: 24px;
+  --xg-head-h: 24px;
+  --xg-rn-w: 40px; /* 행 번호 열 폭 */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  border: 1px solid var(--control);
+  border-radius: var(--r-ctl);
+  overflow: hidden;
+  background: #fff;
+  font-family: var(--sheet-font);
+  font-size: 13px;
+  color: #000;
+}
+
+/* 수식 줄: 선택한 칸의 주소와 값 */
+.xg-fbar {
+  display: flex;
+  height: 28px;
+  border-bottom: 1px solid var(--grid);
+  flex: none;
+}
+.xg-name {
+  width: 72px;
+  flex: none;
+  border-right: 1px solid var(--grid);
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+}
+.xg-fx {
+  width: 30px;
+  flex: none;
+  border-right: 1px solid var(--grid);
+  display: grid;
+  place-items: center;
+  color: var(--ink-3);
+  font-style: italic;
+}
+.xg-val {
+  flex: 1;
+  min-width: 0;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.xg-scroll {
+  position: relative;
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: auto;
+  outline: none;
+  scroll-padding: 48px 8px 8px 48px; /* 키보드로 옮긴 칸이 고정 머리 밑에 가리지 않게 */
+}
+.xg-scroll:focus-visible {
+  box-shadow: inset 0 0 0 2px rgba(6, 67, 140, 0.3); /* hallmark-ignore: 키보드 초점 표시 */
+}
+
+.xg table {
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  width: calc(var(--xg-rn-w) + var(--sum, 0px)); /* 행 번호 열 + 열 폭의 합 */
+  min-width: 100%; /* 컨테이너가 더 넓으면 열이 비율대로 늘어난다 */
+}
+.xg col {
+  width: var(--w);
+}
+.xg col.rn {
+  width: var(--xg-rn-w);
+}
+.xg th,
+.xg td {
+  height: var(--xg-row-h);
+  padding: 0 6px;
+  border-right: 1px solid var(--grid);
+  border-bottom: 1px solid var(--grid);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 400;
+  line-height: calc(var(--xg-row-h) - 1px);
+}
+.xg td {
+  background: #fff;
+  cursor: cell;
+}
+
+/* 열 문자 행: 스크롤해도 위에 고정 */
+.xg thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  height: var(--xg-head-h);
+  line-height: calc(var(--xg-head-h) - 1px);
+  background: var(--frame);
+  color: var(--ink-2);
+  text-align: center;
+  font-size: 12px;
+  border-color: #d6d9de;
+  user-select: none;
+}
+.xg thead th.corner {
+  left: 0;
+  z-index: 4;
+}
+.xg thead th.on {
+  background: var(--active);
+  color: var(--navy);
+  font-weight: 600;
+  box-shadow: inset 0 -2px 0 var(--navy); /* hallmark-ignore: 엑셀식 선택 표시 */
+}
+
+/* 행 번호 열: 스크롤해도 왼쪽에 고정 */
+.xg th.rn {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--frame);
+  color: var(--ink-2);
+  text-align: center;
+  font-size: 12px;
+  border-color: #d6d9de;
+  padding: 0 3px;
+  user-select: none;
+}
+.xg th.rn.on {
+  background: var(--active);
+  color: var(--navy);
+  font-weight: 600;
+  box-shadow: inset -2px 0 0 var(--navy); /* hallmark-ignore: 엑셀식 선택 표시 */
+}
+
+/* 1행 머리글: 열 문자 행 바로 아래에 함께 고정 */
+.xg tr.hd th.rn {
+  top: var(--xg-head-h);
+  z-index: 3;
+}
+.xg tr.hd td {
+  position: sticky;
+  top: var(--xg-head-h);
+  z-index: 2;
+  background: var(--hover);
+  font-weight: 700;
+  text-align: center;
+  border-color: #d6d9de;
+  cursor: default;
+}
+
+.xg td.a-right {
+  text-align: right;
+}
+.xg td.a-center {
+  text-align: center;
+}
+.xg tr.hd td.a-right,
+.xg tr.hd td.a-center {
+  text-align: center;
+}
+
+/* 마우스: --raised, 선택: --b50. 행이 움직이지 않는다 */
+.xg tbody tr:not(.hd):hover td {
+  background: var(--raised);
+}
+.xg tbody tr[aria-selected="true"] td {
+  background: var(--b50);
+}
+.xg td.sel {
+  outline: 2px solid var(--navy);
+  outline-offset: -2px;
+  position: relative;
+  z-index: 1;
+}
+
+/* 안내 행(빈 상태·오류) */
+.xg td.xg-note {
+  height: auto;
+  min-height: var(--xg-row-h);
+  padding: 6px 8px;
+  white-space: normal;
+  line-height: 1.5;
+  color: var(--ink-2);
+  cursor: default;
+}
+.xg td.xg-note .err {
+  font-family: var(--font);
+}
+
+/* 빈 칸은 보통 모양 그대로 둔다 */
+.xg tr[aria-hidden="true"] td {
+  cursor: default;
+}
+
+/* 시트 탭 + 상태 막대 */
+.xg-tabs {
+  display: flex;
+  height: 30px;
+  background: var(--frame);
+  border-top: 1px solid #d6d9de;
+  flex: none;
+}
+.xg-tab {
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  border-right: 1px solid #d6d9de;
+  font-size: 13px;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.xg-tab[aria-current="true"] {
+  background: #fff;
+  color: var(--navy);
+  font-weight: 700;
+  box-shadow: inset 0 -2px 0 var(--navy); /* hallmark-ignore: 엑셀식 시트 탭 */
+}
+.xg-status {
+  display: flex;
+  gap: 16px;
+  height: 26px;
+  align-items: center;
+  padding: 0 10px;
+  background: var(--frame);
+  border-top: 1px solid #d6d9de;
+  font-size: 12px;
+  color: var(--ink-2);
+  font-family: var(--font);
+  flex: none;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.xg-status .sp {
+  flex: 1 1 auto;
+}
+
+/* 휴대폰: 누르는 곳 40px. 잘린 칸의 전체 값을 볼 수 있게 수식 줄은 두고, 시트 탭은 공간을 위해 접는다 */
+@media (max-width: 640px) {
+  .xg {
+    --xg-row-h: 40px;
+    --xg-rn-w: 30px;
+  }
+  .xg table {
+    width: calc(var(--xg-rn-w) + var(--sum-p, var(--sum, 0px)));
+  }
+  .xg col {
+    width: var(--wp, var(--w));
+  }
+  .xg-name {
+    width: 56px;
+  }
+  .xg-tabs {
+    display: none;
+  }
+  .xg-status {
+    height: 32px;
+  }
+  .xg-scroll {
+    scroll-padding: 72px 8px 8px 48px;
+  }
+}

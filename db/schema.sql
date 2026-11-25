@@ -7,13 +7,18 @@
 --
 -- 변경 이력:
 --   v1: hashtags 각 원소 길이 검증을 CHECK + subquery 로 작성 → PG 제약 위반 (0A000)
---   v2(현재): hashtag 원소 검증을 트리거로 이동, parent_id 검증과 통합
+--   v2: hashtag 원소 검증을 트리거로 이동, parent_id 검증과 통합
+--   v3: 평면도의 "마커 위치 수정"을 위해 fmt_locations 좌표(x_pos, y_pos) UPDATE 허용.
+--       앱이 쓰지 않는 DB 쪽 검색(RPC fmt_search_items, trigram/이름/해시태그 인덱스) 제거.
+--       검색은 브라우저 메모리에서 하므로 DB 쪽 검색 객체가 필요 없다.
+--   v4: 평면도의 "마커 추가"를 위해 fmt_locations INSERT 허용 (name, x_pos, y_pos).
+--   v5(현재): "마커 수정" 모드의 수납장 삭제를 위해 fmt_locations DELETE 허용.
+--       수납장을 지우면 그 안의 물품도 on delete cascade 로 함께 지워진다.
 --
 -- ------------------------------------------------------------
 -- 1) 확장
 -- ------------------------------------------------------------
 create extension if not exists "pgcrypto"; -- gen_random_uuid()
-create extension if not exists pg_trgm;    -- gin_trgm_ops (name ILIKE 검색 최적화)
 
 -- ------------------------------------------------------------
 -- 2) 이전 시도(v1)에서 만들어졌을 수 있는 잔재 정리 (멱등 — 없으면 no-op)
@@ -105,31 +110,19 @@ create trigger trg_fmt_items_check_integrity
   for each row execute function public.fmt_items_check_integrity();
 
 -- ------------------------------------------------------------
--- 6) Indexes (검색/조회 최적화)
+-- 6) Indexes (외래키 조회용)
 -- ------------------------------------------------------------
 create index if not exists idx_fmt_items_location_id  on public.fmt_items (location_id);
 create index if not exists idx_fmt_items_parent_id    on public.fmt_items (parent_id);
-create index if not exists idx_fmt_items_name         on public.fmt_items (name);
-create index if not exists idx_fmt_items_name_trgm    on public.fmt_items using gin (name gin_trgm_ops);
-create index if not exists idx_fmt_items_hashtags_gin on public.fmt_items using gin (hashtags);
 
 -- ------------------------------------------------------------
--- 7) 검색 RPC (이름 또는 해시태그 부분일치, 대소문자 무시)
+-- 7) 쓰지 않는 객체 정리 (v2까지 있던 DB 쪽 검색). 없으면 no-op.
+--    확장(pg_trgm)은 다른 앱이 쓸 수 있어 지우지 않는다.
 -- ------------------------------------------------------------
-create or replace function public.fmt_search_items(q text)
-returns setof public.fmt_items
-language sql stable as $$
-  select i.*
-  from public.fmt_items i
-  where q is not null and length(q) > 0
-    and (
-      i.name ilike '%' || q || '%'
-      or exists (
-        select 1 from unnest(i.hashtags) t
-        where t ilike '%' || q || '%'
-      )
-    );
-$$;
+drop function if exists public.fmt_search_items(text);
+drop index if exists public.idx_fmt_items_name;
+drop index if exists public.idx_fmt_items_name_trgm;
+drop index if exists public.idx_fmt_items_hashtags_gin;
 
 -- ------------------------------------------------------------
 -- 8) RLS : anon 전체 허용 (1인용 취미 서비스 정책)
@@ -162,5 +155,33 @@ create policy "fmt_items anon delete"
   on public.fmt_items for delete
   to anon using (true);
 
--- RPC 실행 권한
-grant execute on function public.fmt_search_items(text) to anon;
+-- ------------------------------------------------------------
+-- 9) 마커 추가 · 마커 수정 (평면도의 "마커 추가", "마커 수정" 버튼)
+--    anon이 fmt_locations에서 할 수 있는 것은 아래 셋뿐이다.
+--      - 새 수납장 추가: name, x_pos, y_pos 를 넣는 INSERT (id는 자동 생성)
+--      - 마커 위치 수정: x_pos, y_pos 만 바꾸는 UPDATE
+--      - 수납장 삭제: DELETE. 그 수납장의 물품도 fmt_items.location_id 의
+--        on delete cascade 로 함께 지워진다.
+--    수납장 이름 변경은 여전히 SQL Editor / Table Editor로만 한다.
+--    정책이 없으면 INSERT는 오류(42501)가 나고, UPDATE·DELETE는 오류 없이 0행을
+--    갱신·삭제하므로 이 블록이 꼭 필요하다.
+-- ------------------------------------------------------------
+drop policy if exists "fmt_locations anon insert" on public.fmt_locations;
+create policy "fmt_locations anon insert"
+  on public.fmt_locations for insert
+  to anon with check (true);
+
+drop policy if exists "fmt_locations anon update" on public.fmt_locations;
+create policy "fmt_locations anon update"
+  on public.fmt_locations for update
+  to anon using (true) with check (true);
+
+drop policy if exists "fmt_locations anon delete" on public.fmt_locations;
+create policy "fmt_locations anon delete"
+  on public.fmt_locations for delete
+  to anon using (true);
+
+revoke insert, update, delete on public.fmt_locations from anon;
+grant  insert (name, x_pos, y_pos) on public.fmt_locations to anon;
+grant  update (x_pos, y_pos)       on public.fmt_locations to anon;
+grant  delete                      on public.fmt_locations to anon;

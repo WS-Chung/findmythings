@@ -12,6 +12,8 @@ export interface UseSearchResult {
   data: Item[];
   /** 사용자가 실제로 검색어를 입력한 상태 (debounced.trim().length > 0). */
   hasQuery: boolean;
+  /** 디바운스를 거쳐 실제 검색에 쓰인 검색어(앞뒤 공백 제거). 제목 문구에 쓴다. */
+  query: string;
 }
 
 /**
@@ -20,7 +22,7 @@ export interface UseSearchResult {
  *   - DEBOUNCE_MS(200ms) 후
  *       · 입력값이 있으면 filterItems(items, debouncedQuery)
  *       · 입력값이 0자이면 모든 items를 name 기준 가나다(`localeCompare ko`) 정렬해 반환
- *   - RPC 호출 없음. error 상태 없음 (메모리 작업은 실패하지 않음).
+ *   - 네트워크 호출 없음. error 상태 없음 (메모리 작업은 실패하지 않음).
  */
 export function useSearch(query: string, items: Item[]): UseSearchResult {
   const debounced = useDebounce(query, DEBOUNCE_MS);
@@ -37,5 +39,5 @@ export function useSearch(query: string, items: Item[]): UseSearchResult {
     return filterItems(items, trimmed);
   }, [items, trimmed, hasQuery]);
 
-  return { data, hasQuery };
+  return { data, hasQuery, query: trimmed };
 }

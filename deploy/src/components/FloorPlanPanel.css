@@ -1,35 +1,95 @@
 /* ============================================================
- * FloorPlanPanel — 우측 패널.
- *   데스크탑: flex item으로 남은 폭 모두 차지 (≈ 56vw, 도면 1.15배 확대 효과)
- *   모바일: 단일 컬럼 모드에서 너비 100%
- *   <FloorPlan>을 그대로 보유하거나, locations fetch가 실패하면
- *   안내 텍스트를 표시한다.
+ * 평면도 블록 — 제목 줄 + 평면도.
+ *   제목 줄은 높이 32px로 고정해 수정·추가 모드로 바뀌어도 평면도가 움직이지 않는다.
  * ============================================================ */
-.floorplan-panel {
-  flex: 1 1 auto;
+.map-pane {
   display: flex;
   flex-direction: column;
-  font-family: var(--font-text);
-  color: var(--color-ink);
-  /* 도면 박스가 column 폭 100%를 차지하므로 자체 padding은 두지 않는다. */
+  gap: 12px;
+  min-width: 0;
+  scroll-margin-top: 56px; /* 위에 붙는 상단 막대(48px)에 가리지 않게 */
+}
+.map-pane__head {
+  display: flex;
+  align-items: center;
+  gap: 4px 12px;
+  min-height: 32px;
+}
+.map-pane__head h2 {
+  font-size: 16px;
+  font-weight: 600;
+  flex: none;
+}
+.map-pane__note {
+  flex: 1 1 0;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.map-pane__keys {
+  color: var(--ink-3);
+}
+.map-pane__actions {
+  display: flex;
+  gap: 8px;
+  flex: none;
+  margin-left: auto;
+}
+.map-pane__error {
+  padding: 16px;
+  border: 1px dashed var(--control);
+  border-radius: var(--r-panel);
 }
 
-.floorplan-panel__error {
-  padding: var(--sp-lg);
-  text-align: center;
-  color: var(--color-ink-muted-48);
-  font-size: var(--fs-body);
-  line-height: var(--lh-body);
-  letter-spacing: var(--ls-body);
-  border: 2px solid var(--color-hairline);
-  border-radius: var(--radius-lg);
-  background: var(--color-canvas);
-  box-shadow: var(--shadow-elevated);
-  margin-top: 30px;
+/* 마커 추가: 이름 입력 */
+.map-pane__add {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 1 320px;
+  min-width: 0;
+}
+.map-pane__add label {
+  flex: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.map-pane__add .inp {
+  flex: 1 1 0;
+  min-width: 0;
 }
 
-@media (max-width: 833px) {
-  .floorplan-panel {
-    width: 100%;
+/* 휴대폰 */
+@media (max-width: 640px) {
+  /* 평소의 마커 수는 버튼 두 개가 한 줄에 들어가도록 접는다. 방금 한 일의 결과는 아래 줄에 보인다 */
+  .map-pane__count {
+    display: none;
+  }
+  .map-pane__note--notice {
+    order: 3;
+    flex-basis: 100%;
+    white-space: normal;
+  }
+  .map-pane__head {
+    flex-wrap: wrap;
+  }
+
+  /* 수정·추가 모드: 안내 문장은 길어서 버튼 아래 줄로 내려간다 */
+  .map-pane__head--editing .map-pane__note {
+    order: 3;
+    flex-basis: 100%;
+    white-space: normal;
+  }
+  .map-pane__head--adding .map-pane__add {
+    order: 2;
+    flex: 1 1 100%;
+  }
+  .map-pane__keys {
+    display: none; /* 휴대폰에는 방향키가 없다 */
   }
 }

@@ -1,6 +1,7 @@
 import {
   MAX_HASHTAGS,
   MAX_HASHTAG_LEN,
+  MAX_LOCATION_NAME_LEN,
   MAX_NAME_LEN,
 } from "./constants";
 import type { Item, UUID } from "../types/db";
@@ -91,6 +92,32 @@ export function validateParent(
   }
   if (parent.location_id !== locationId) {
     return { ok: false, message: violationMessage };
+  }
+  return { ok: true };
+}
+
+/**
+ * 새 수납장(마커) 이름 검증.
+ *   - trim 후 1..MAX_LOCATION_NAME_LEN(=20)자.
+ *   - 이미 있는 수납장 이름과 같으면 안 된다. 같은 이름이 둘이면 표의 "보관위치"와
+ *     평면도 이름표로 어느 수납장인지 구별할 수 없다. (DB에는 유일 제약이 없다)
+ */
+export function validateLocationName(
+  name: string,
+  existingNames: string[],
+): ValidationResult {
+  const trimmed = name.trim();
+  if (trimmed.length < 1) {
+    return { ok: false, message: "수납장 이름을 입력해 주세요" };
+  }
+  if (trimmed.length > MAX_LOCATION_NAME_LEN) {
+    return {
+      ok: false,
+      message: `수납장 이름은 ${MAX_LOCATION_NAME_LEN}자 이하여야 합니다`,
+    };
+  }
+  if (existingNames.some((n) => n.trim() === trimmed)) {
+    return { ok: false, message: "같은 이름의 수납장이 이미 있습니다" };
   }
   return { ok: true };
 }

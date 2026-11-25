@@ -37,6 +37,3 @@ Thumbs.db
 
 # Claude Code 개인 설정
 .claude/settings.local.json
-
-# 사내 디자인 규칙 폴더 (사내 자료 — 저장소에 올리지 않음)
-DA_UI_hallmark/

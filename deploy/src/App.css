@@ -1,0 +1,74 @@
+/* ============================================================
+ * 화면 배치: 제목 줄 + 작업 영역(검색 / 평면도 / 물품 표)
+ *
+ * 데스크톱(1101px 이상, 1920×1080 기준):
+ *   ┌ 검색 ───────┐ ┌ 평면도 ────────────┐
+ *   ├ 물품 표 ────┤ │ (1060:740 비율)     │
+ *   └ (평면도와 같은 높이) ┘ └──────────────────┘
+ *   평면도 폭은 "화면 높이에 맞는 폭"을 기준으로 정한다. 그래서 화면 한 장 안에 평면도 전체와
+ *   표가 들어오고, 남는 가로 폭은 표가 쓴다.
+ *
+ * 1100px 이하(태블릿·휴대폰): 검색 → 평면도 → 물품 표 순서로 쌓는다.
+ *   평면도가 표 위에 있어야 결과를 눌렀을 때 마커 강조가 바로 보인다.
+ * ============================================================ */
+.pg-head {
+  margin-bottom: 20px;
+}
+.pg-head .desc {
+  min-height: 22px;
+}
+
+.work {
+  /* 상단 막대·여백·제목 줄·평면도 제목 줄이 쓰는 세로 공간(대략 226px)을 뺀 높이에 맞는 평면도 폭 */
+  --map-w: clamp(480px, calc((100dvh - 230px) * 1060 / 740), 64%);
+  display: grid;
+  gap: 12px 16px;
+  grid-template-columns: minmax(320px, 1fr) var(--map-w);
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-areas:
+    "search map"
+    "sheet  map";
+  align-items: stretch;
+}
+.work__search {
+  grid-area: search;
+  min-width: 0;
+}
+.work__map {
+  grid-area: map;
+  min-width: 0;
+}
+/* 표는 평면도 높이에 맞춰 늘어나므로 자신의 높이를 요구하지 않게 둔다 */
+.work__sheet {
+  grid-area: sheet;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+}
+.work__sheet > .result-sheet {
+  position: absolute;
+  inset: 0;
+}
+
+@media (max-width: 1100px) {
+  .work {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+    grid-template-areas:
+      "search"
+      "map"
+      "sheet";
+  }
+  .work__sheet {
+    height: clamp(320px, 56dvh, 520px);
+  }
+}
+
+@media (max-width: 640px) {
+  .pg-head {
+    margin-bottom: 16px;
+  }
+  .work {
+    gap: 12px;
+  }
+}

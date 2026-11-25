@@ -1,81 +1,195 @@
 /* ============================================================
- * Design Tokens — Apple style
- *   Apple 스타일을 참고해 만든 Find My Things 전용 토큰.
- *   모든 컴포넌트는 :root CSS 변수만 참조합니다.
+ * 디자인 토큰 + 기본 규칙
+ *
+ * 회색 틀(--frame) 위에 흰 시트(--surface) 한 장을 올리는 업무 화면 규칙이다.
+ * :root 값은 바꾸지 않는다. 필요한 값이 없으면 가장 가까운 값을 쓴다.
+ * 네이비(--navy)는 다섯 곳에만 쓴다: 로고, 화면의 주 버튼 하나, 선택 표시,
+ * 주 데이터 한 계열, 강조 면. 메뉴·머리글·테두리는 회색으로 둔다.
  * ============================================================ */
 :root {
-  /* colors */
-  --color-primary: #0066cc;
-  --color-primary-focus: #0071e3;
-  --color-ink: #1d1d1f;
-  --color-canvas: #ffffff;
-  --color-canvas-parchment: #f5f5f7;
-  --color-hairline: #e0e0e0;
-  --color-on-primary: #ffffff;
-  --color-ink-muted-48: #7a7a7a;
-
-  /* danger — 삭제/위험 액션 (Apple 시스템 red 톤). */
-  --color-danger: #d4332f;
-  --color-danger-focus: #b8281f;
-
-  /**
-   * Page background — 종이/시멘트벽 톤의 차분한 회색.
-   * BOX(SearchPanel/FloorPlan)는 흰색이고, 이 배경 위에 살짝 떠 있는 듯한 입체감을
-   * shadow-elevated와 조합해 표현한다.
-   */
-  --color-surface-page: #e8e8ec;
-
-  /**
-   * Elevated surface shadow — BOX 컨테이너를 종이톤 배경에서 띄워 보이게 한다.
-   * Apple style의 product-shadow보다 약하게 적용해 미니멀함을 유지한다.
-   */
-  --shadow-elevated:
-    0 1px 2px rgba(0, 0, 0, 0.04),
-    0 6px 18px rgba(0, 0, 0, 0.08);
-
-  /* typography — 한글 가독성용 Pretendard + 헤더 한정 Noto Sans KR.
-   * - --font-display: 디스플레이 텍스트(ItemPopup 헤더 등)에 Noto Sans KR 우선,
-   *   미적용 환경에서는 Pretendard로 fallback
-   * - --font-text: 본문/UI 전반은 Pretendard. */
-  --font-display: "Noto Sans KR", "Pretendard Variable", Pretendard, system-ui, -apple-system, sans-serif;
-  --font-text: "Pretendard Variable", Pretendard, system-ui, -apple-system, sans-serif;
-  --fs-body: 17px;
-  --lh-body: 1.47;
-  --ls-body: -0.374px;
-  --fs-tagline: 21px;
-  --fs-caption: 14px;
-
-  /* radii */
-  --radius-sm: 8px;
-  --radius-md: 11px;
-  --radius-lg: 18px;
-  --radius-pill: 9999px;
-
-  /* spacing */
-  --sp-xxs: 4px;
-  --sp-xs: 8px;
-  --sp-sm: 12px;
-  --sp-md: 17px;
-  --sp-lg: 24px;
-  --sp-xl: 32px;
-  --sp-xxl: 48px;
+  color-scheme: light;
+  /* 회사 8색 */
+  --co-black: #000000;
+  --co-dark: #555555;
+  --co-mid: #a0a0a0;
+  --co-light: #dedede;
+  --co-mint: #7dead5;
+  --co-cyan: #1bbbcc;
+  --co-blue: #4383af;
+  --co-navy: #06438c;
+  --navy: #06438c;
+  /* 네이비·민트 단계 */
+  --b50: #e5f0f5;
+  --b100: #c7dce7;
+  --b700: #052e62;
+  --b800: #031f44;
+  --e100: #e5f8f2;
+  --e800: #16735f;
+  /* 면 */
+  --frame: #f4f5f7; /* 바탕(틀) */
+  --surface: #ffffff; /* 내용 면(시트·패널) */
+  --raised: #fafafa; /* 면 안의 보조 면 */
+  --hover: #eef0f3; /* 마우스를 올렸을 때 */
+  --active: #e6e8ec; /* 선택된 것 */
+  /* 선 */
+  --edge: #e3e5e9; /* 시트·패널 테두리 */
+  --rule: #eef0f3; /* 표·목록 행 구분 */
+  --control: #cbd0d6; /* 버튼 테두리 */
+  --control-strong: #868c93; /* 입력칸 테두리 (3:1) */
+  --grid: #dedede; /* 엑셀형 표 격자 */
+  /* 글자 */
+  --ink: #111111; /* 제목, 본문, 핵심 값 */
+  --ink-2: #555555; /* 설명, 표 칸 */
+  --ink-3: #6b6f76; /* 보조 정보 (--hover·--active·--b50 위에는 쓰지 않는다) */
+  /* 그림자: 떠 있는 것(대화상자 등)에만 */
+  --float: 0 10px 28px rgba(0, 0, 0, 0.08);
+  /* 글꼴 */
+  --font: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+    system-ui, "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR",
+    "Malgun Gothic", sans-serif;
+  --sheet-font: "HM Sheet", "Malgun Gothic", "맑은 고딕", "Apple SD Gothic Neo",
+    "Noto Sans KR", sans-serif;
+  /* 모서리 */
+  --r-tag: 4px;
+  --r-ctl: 6px;
+  --r-panel: 8px;
+  --r-sheet: 16px;
 }
 
-html,
-body,
-#root {
-  margin: 0;
-  padding: 0;
-  background: var(--color-surface-page);
-  color: var(--color-ink);
-  font-family: var(--font-text);
-  font-size: var(--fs-body);
-  line-height: var(--lh-body);
-  letter-spacing: var(--ls-body);
+/* 엑셀형 표 글꼴: 설치된 맑은 고딕을 이름 하나로 묶는다 */
+@font-face {
+  font-family: "HM Sheet";
+  src: local("Malgun Gothic"), local("MalgunGothic"), local("맑은 고딕");
+  font-weight: 400;
+}
+@font-face {
+  font-family: "HM Sheet";
+  src: local("Malgun Gothic Bold"), local("MalgunGothicBold"),
+    local("맑은 고딕 Bold");
+  font-weight: 700;
 }
 
+/* ------------------------------------------------------------ 기본 */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
+}
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+body {
+  background: var(--frame);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.5;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+}
+h1,
+h2,
+h3,
+p,
+ul,
+ol,
+dl,
+dd {
+  margin: 0;
+}
+ul,
+ol {
+  padding: 0;
+  list-style: none;
+}
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+  touch-action: manipulation;
+}
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+:focus-visible {
+  outline: 2px solid var(--navy);
+  outline-offset: 2px;
+}
+::selection {
+  background: var(--b100);
+}
+[hidden] {
+  display: none !important;
+}
+
+/* 화면에는 보이지 않고 화면 읽기 프로그램에만 읽히는 글 */
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 16px 회색 선 아이콘 */
+.ic {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* 글자 크기: 제목 22px, 절 제목 16px, 본문 14px, 표 13px, 보조 12px */
+h1.t {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  text-wrap: balance;
+}
+.desc {
+  margin-top: 4px;
+  font-size: 14px;
+  color: var(--ink-2);
+  line-height: 1.6;
+}
+.desc b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  h1.t {
+    font-size: 20px;
+  }
+}
+
+/* 움직임은 상태 변화에만 쓴다. 줄이기를 켠 사용자에게는 모두 끈다. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
 }

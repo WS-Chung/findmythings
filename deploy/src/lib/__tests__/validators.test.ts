@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { Item } from "../../types/db";
 import {
   validateHashtags,
+  validateLocationName,
   validateName,
   validateParent,
 } from "../validators";
@@ -76,5 +77,29 @@ describe("validateParent", () => {
 
   it("존재하지 않는 부모 id는 실패", () => {
     expect(validateParent("ghost", [baseParent], "loc-A").ok).toBe(false);
+  });
+});
+
+describe("validateLocationName", () => {
+  const existing = ["거실 수납장", "주방 상부장"];
+
+  it("1~20자이고 겹치지 않으면 통과", () => {
+    expect(validateLocationName("안방 옷장", existing).ok).toBe(true);
+    expect(validateLocationName("가".repeat(20), existing).ok).toBe(true);
+  });
+
+  it("비어 있거나 공백뿐이면 실패", () => {
+    expect(validateLocationName("", existing).ok).toBe(false);
+    expect(validateLocationName("   ", existing).ok).toBe(false);
+  });
+
+  it("20자를 넘으면 실패", () => {
+    const r = validateLocationName("가".repeat(21), existing);
+    expect(r.ok).toBe(false);
+  });
+
+  it("이미 있는 이름이면 앞뒤 공백을 무시하고 실패", () => {
+    const r = validateLocationName("  거실 수납장 ", existing);
+    expect(r).toEqual({ ok: false, message: "같은 이름의 수납장이 이미 있습니다" });
   });
 });

@@ -1,194 +1,98 @@
 /* ============================================================
- * RegisterForm — ItemPopup 내부에서 활성화되는 등록/수정 폼.
- *   저장 버튼 button-primary, 취소 버튼 button-secondary-pill.
- *   별도 색·폰트·반경을 도입하지 않고 :root 토큰만 사용.
+ * RegisterForm — ItemPopup 안의 등록/수정 폼.
+ *   라벨은 칸 위, 입력칸은 흰 바탕 + 1px --control-strong. 주 버튼은 "저장" 하나.
  * ============================================================ */
-.register-form {
+.rform {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-md);
-  font-family: var(--font-text);
-  color: var(--color-ink);
-  /* ItemPopup의 list ↔ form 전환을 자연스럽게. */
-  animation: fade-in 180ms ease-out;
+  gap: 16px;
+  max-width: 520px;
+  color: var(--ink);
 }
-
-.register-form__field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-xxs);
-}
-
-.register-form__label {
-  font-size: var(--fs-caption);
+.rform__title {
+  font-size: 16px;
   font-weight: 600;
-  color: var(--color-ink);
-  letter-spacing: 0;
 }
 
-.register-form__required {
-  color: var(--color-primary);
-}
-
-.register-form__input {
-  width: 100%;
-  padding: 10px var(--sp-sm);
-  background: var(--color-canvas);
-  color: var(--color-ink);
-  border: 1px solid var(--color-hairline);
-  border-radius: var(--radius-sm);
-  font-family: var(--font-text);
-  font-size: var(--fs-body);
-  line-height: var(--lh-body);
-  letter-spacing: var(--ls-body);
-  outline: none;
-}
-
-.register-form__input:focus-visible {
-  border-color: var(--color-primary);
-}
-
-.register-form__input:disabled {
-  background: var(--color-canvas-parchment);
-  color: var(--color-ink-muted-48);
-  cursor: not-allowed;
-}
-
-.register-form__hint {
-  margin: 0;
-  font-size: var(--fs-caption);
-  color: var(--color-ink-muted-48);
-  letter-spacing: 0;
-}
-
-.register-form__chips {
-  list-style: none;
-  margin: 0 0 var(--sp-xxs) 0;
-  padding: 0;
+.rform__chips {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--sp-xxs);
+  gap: 4px;
+}
+.rform__chip {
+  height: 24px;
+  padding-right: 2px;
+  background: var(--hover);
+}
+.rform__chip-x {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--r-tag);
+  color: var(--ink-2);
+}
+.rform__chip-x:hover {
+  background: var(--active);
+  color: var(--ink);
+}
+.rform__chip-x .ic {
+  width: 12px;
+  height: 12px;
 }
 
-.register-form__chip {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sp-xxs);
-  padding: 2px var(--sp-xs);
-  background: var(--color-canvas-parchment);
-  color: var(--color-ink);
-  border-radius: var(--radius-pill);
-  font-size: var(--fs-caption);
-  letter-spacing: 0;
-  line-height: 1.4;
+/* 파일 선택: 칸 안의 버튼을 보조 버튼 모양으로 */
+.rform__file {
+  height: auto;
+  min-height: 32px;
+  padding: 3px 4px;
+  font-size: 13px;
 }
-
-.register-form__chip-remove {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  padding: 0;
-  background: transparent;
-  border: none;
-  border-radius: var(--radius-pill);
-  color: var(--color-ink-muted-48);
-  cursor: pointer;
-  font-size: 14px;
-  line-height: 1;
-}
-
-.register-form__chip-remove:hover,
-.register-form__chip-remove:focus-visible {
-  background: var(--color-hairline);
-  color: var(--color-ink);
-  outline: none;
-}
-
-.register-form__file {
-  font-family: var(--font-text);
-  font-size: var(--fs-caption);
-  color: var(--color-ink);
-}
-
-.register-form__preview {
-  margin-top: var(--sp-xs);
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
-  border: 1px solid var(--color-hairline);
-  border-radius: var(--radius-sm);
-}
-
-/* 색을 새로 도입하지 않기 위해 에러 안내는 ink + 굵게로 표현. */
-.register-form__error {
-  margin: 0;
-  padding: var(--sp-xs) var(--sp-sm);
-  background: var(--color-canvas-parchment);
-  color: var(--color-ink);
-  border: 1px solid var(--color-hairline);
-  border-radius: var(--radius-sm);
-  font-size: var(--fs-caption);
+.rform__file::file-selector-button {
+  height: 24px;
+  margin-right: 10px;
+  padding: 0 10px;
+  border: 1px solid var(--control);
+  border-radius: var(--r-ctl);
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
   font-weight: 600;
-  letter-spacing: 0;
+  cursor: pointer;
+}
+.rform__preview {
+  display: block;
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border: 1px solid var(--edge);
+  border-radius: var(--r-panel);
 }
 
-.register-form__actions {
+.rform__actions {
   display: flex;
   justify-content: flex-end;
-  gap: var(--sp-xs);
-  margin-top: var(--sp-xs);
+  gap: 8px;
+  padding-top: 4px;
 }
 
-/* button-secondary-pill: 투명 bg, primary 텍스트, primary border, pill. */
-.register-form__cancel {
-  padding: 11px 22px;
-  background: transparent;
-  color: var(--color-primary);
-  border: 1px solid var(--color-primary);
-  border-radius: var(--radius-pill);
-  font-family: var(--font-text);
-  font-size: var(--fs-body);
-  letter-spacing: var(--ls-body);
-  cursor: pointer;
-}
-
-.register-form__cancel:hover,
-.register-form__cancel:focus-visible {
-  background: var(--color-canvas-parchment);
-  outline: none;
-}
-
-.register-form__cancel:disabled {
-  cursor: not-allowed;
-  color: var(--color-ink-muted-48);
-  border-color: var(--color-hairline);
-}
-
-/* button-primary: bg=primary, color=on-primary, pill, padding 11×22. */
-.register-form__save {
-  padding: 11px 22px;
-  background: var(--color-primary);
-  color: var(--color-on-primary);
-  border: 1px solid var(--color-primary);
-  border-radius: var(--radius-pill);
-  font-family: var(--font-text);
-  font-size: var(--fs-body);
-  letter-spacing: var(--ls-body);
-  cursor: pointer;
-}
-
-.register-form__save:hover:not(:disabled),
-.register-form__save:focus-visible:not(:disabled) {
-  background: var(--color-primary-focus);
-  border-color: var(--color-primary-focus);
-  outline: none;
-}
-
-.register-form__save:disabled {
-  cursor: not-allowed;
-  background: var(--color-canvas-parchment);
-  color: var(--color-ink-muted-48);
-  border-color: var(--color-hairline);
+@media (max-width: 640px) {
+  .rform__file {
+    min-height: 40px;
+    padding: 6px 6px;
+  }
+  .rform__file::file-selector-button {
+    height: 28px;
+  }
+  .rform__chip {
+    height: 32px;
+    padding-left: 10px;
+  }
+  .rform__chip-x {
+    width: 28px;
+    height: 28px;
+  }
+  .rform__actions .btn {
+    flex: 1 1 0;
+  }
 }

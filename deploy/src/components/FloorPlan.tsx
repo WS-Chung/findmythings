@@ -9,9 +9,8 @@ export interface FloorPlanProps {
    */
   children: (wrapperWidth: number) => ReactNode;
   /**
-   * true이면 배경 도면(background.png)이 부드러운 페이드와 함께 더 투명해지고
-   * 비강조 마커도 흐릿하게 처리되어, 강조 중인 마커의 펄스가 더 두드러져 보인다.
-   * 강조 마커 자체의 불투명도에는 영향을 주지 않는다.
+   * true이면 배경 도면이 더 옅어지고 강조되지 않은 마커도 흐려져,
+   * 강조 중인 마커가 두드러져 보인다. 강조 마커 자체에는 영향이 없다.
    */
   dimmed?: boolean;
 }
@@ -21,10 +20,8 @@ export interface FloorPlanProps {
  *
  * 동작:
  *   - `aspect-ratio: 1060 / 740`로 폭에 비례하는 높이 자동 계산
- *   - 마운트 시 ResizeObserver로 wrapper 폭을 측정 → state로 노출
- *   - 부모 폭이 변하면 ResizeObserver 콜백이 fire되어 마커 좌표가 실시간 재계산
- *   - unmount 시 observer.disconnect()로 정리
- *   - `dimmed`이 truthy면 `.floorplan--dimmed` 클래스 부착 → 배경이 페이드하며 더 투명해진다
+ *   - 마운트 시 ResizeObserver로 wrapper 폭을 측정 → render prop으로 전달
+ *   - 부모 폭이 변하면 마커 좌표가 실시간 재계산
  */
 export function FloorPlan({ children, dimmed = false }: FloorPlanProps) {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
@@ -52,7 +49,12 @@ export function FloorPlan({ children, dimmed = false }: FloorPlanProps) {
   const className = dimmed ? "floorplan floorplan--dimmed" : "floorplan";
 
   return (
-    <div className={className} ref={wrapperRef}>
+    <div
+      className={className}
+      ref={wrapperRef}
+      role="group"
+      aria-label="집 평면도"
+    >
       <div className="floorplan__bg" aria-hidden="true" />
       <div className="floorplan__layer">{children(wrapperWidth)}</div>
     </div>

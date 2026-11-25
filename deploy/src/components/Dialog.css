@@ -1,0 +1,84 @@
+/* ============================================================
+ * 대화상자: 떠 있는 요소라 그림자(--float)를 쓴다.
+ * 폭 600px(넓게 900px), 뒤 가림막은 불투명도 0.32의 검정. 등장 효과 없음.
+ * ============================================================ */
+.dlg-root {
+  position: fixed;
+  inset: 0;
+  z-index: 800;
+}
+.dlg-bg {
+  position: absolute;
+  inset: 0;
+  background: rgba(17, 17, 17, 0.32);
+}
+.dlg {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(var(--dlg-w, 600px), calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid var(--edge);
+  box-shadow: var(--float); /* hallmark-ignore: 떠 있는 요소 */
+  outline: none;
+}
+.dlg-h {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 12px 8px 20px;
+  flex: none;
+}
+.dlg-t {
+  flex: 1;
+  min-width: 0;
+}
+.dlg-t h2 {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 32px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dlg-note {
+  margin-top: -4px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.dlg-b {
+  padding: 4px 20px 16px;
+  overflow: auto;
+  font-size: 14px;
+  color: var(--ink-2);
+  line-height: 1.6;
+  min-height: 0;
+}
+.dlg-b b {
+  color: var(--ink);
+}
+.dlg-f {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 20px 16px;
+  border-top: 1px solid var(--rule);
+  flex: none;
+}
+
+@media (max-width: 640px) {
+  .dlg-h {
+    padding: 8px 4px 4px 16px;
+  }
+  .dlg-b {
+    padding: 4px 16px 16px;
+  }
+  .dlg-f {
+    padding: 12px 16px 16px;
+  }
+}

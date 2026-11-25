@@ -1,42 +1,62 @@
-import type { ChangeEvent } from "react";
+import { useEffect, useRef, type ChangeEvent } from "react";
+import { Icon } from "./Icon";
 import "./SearchInput.css";
 
 export interface SearchInputProps {
   value: string;
   onChange: (next: string) => void;
-  placeholder?: string;
 }
 
 /**
- * 검색바.
+ * 검색 입력. 화면에 하나뿐이다.
  *
- * design 토큰 `search-input` 사양:
- *   - 배경: canvas (#ffffff)
- *   - 텍스트: ink (#1d1d1f)
- *   - 타이포: body (17px / 400 / -0.374px)
- *   - 반경: pill (9999px)
- *   - 패딩: 12px × 20px, height 44px
- *   - focus: primary-focus border (디자인 시스템 상 outline 토큰이 없으므로 border-color 변경)
- *
- * Controlled component. 디바운스/검색 트리거는 부모(App)가 useDebounce + useSearch로 처리한다.
+ * - 높이 32px, 앞에 돋보기. 휴대폰에서는 40px.
+ * - `/` 키를 누르면(다른 입력칸에 있지 않을 때) 이 칸으로 이동한다.
+ * - Controlled component. 디바운스는 부모가 useSearch로 처리한다.
  */
-export function SearchInput({
-  value,
-  onChange,
-  placeholder = "물품 또는 #해시태그 검색",
-}: SearchInputProps) {
+export function SearchInput({ value, onChange }: SearchInputProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "/" || e.ctrlKey || e.metaKey || e.altKey) return;
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable)) {
+        return;
+      }
+      // 대화상자가 열려 있으면 가로채지 않는다.
+      if (document.querySelector('[role="dialog"]')) return;
+      e.preventDefault();
+      inputRef.current?.focus();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     onChange(e.target.value);
   };
 
   return (
-    <input
-      type="search"
-      className="search-input"
-      value={value}
-      onChange={handleChange}
-      placeholder={placeholder}
-      aria-label="물품 검색"
-    />
+    <div className="search" role="search">
+      <label className="sr" htmlFor="search-input">
+        물품 검색
+      </label>
+      <Icon name="search" />
+      <input
+        id="search-input"
+        ref={inputRef}
+        type="search"
+        className="inp"
+        value={value}
+        onChange={handleChange}
+        placeholder="물품 이름 또는 해시태그"
+        autoComplete="off"
+        enterKeyHint="search"
+      />
+      <kbd className="search__key" aria-hidden="true">
+        /
+      </kbd>
+    </div>
   );
 }

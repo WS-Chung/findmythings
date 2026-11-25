@@ -1,32 +1,82 @@
 /* ============================================================
- * Layout — 컨텐츠 영역 가로 중앙 정렬.
- *
- * 데스크탑 (≥ 834px):
- *   - 폭: 24vw(검색) + 20px(gap) + 56vw(도면) = calc(80vw + 20px)
- *   - 가운데 정렬, 좌우 여백 동일
- *   - flex로 두 BOX를 나란히 배치하고 gap: 20px로만 사이를 띄움
- *   - align-items: stretch → 두 BOX의 박스 높이가 자동으로 일치 (도면이 결정)
- *
- * 모바일/태블릿 포트레이트 (≤ 833px):
- *   - 단일 컬럼, 95vw 폭
- *   - SearchPanel이 위, FloorPlanPanel이 아래 (DOM 순서 그대로)
- *   - 두 BOX 사이 vertical gap은 spacing 토큰으로 호흡 확보
+ * 셸: 회색 틀(상단 막대) + 흰 시트.
+ *   시트는 모서리 16px, 1px --edge 테두리, 그림자 없음. 좌우·아래에서 8px 띄운다.
+ *   화면 스크롤은 문서가 맡는다. 상단 막대만 위에 붙는다.
  * ============================================================ */
-.layout {
-  width: calc(80vw + 20px);
-  margin: 0 auto;
-  min-height: 100vh;
-  padding: var(--sp-lg) 0;
+.top {
+  position: sticky;
+  top: 0;
+  z-index: 30;
   display: flex;
-  gap: 20px;
-  align-items: stretch;
+  align-items: center;
+  height: 48px;
+  padding: 0 16px;
+  background: var(--frame);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.mark {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-ctl);
+  background: var(--navy);
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+.mark svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+.brand .nm {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  color: var(--ink);
+}
+.brand .sb {
+  display: block;
+  font-size: 12px;
+  color: var(--ink-3);
+  line-height: 1.2;
 }
 
-@media (max-width: 833px) {
-  .layout {
-    flex-direction: column;
-    width: 95vw;
-    gap: var(--sp-lg);
-    align-items: stretch;
+.main {
+  margin: 0 8px 8px;
+  background: var(--surface);
+  border: 1px solid var(--edge);
+  border-radius: var(--r-sheet);
+  min-height: calc(100dvh - 56px);
+}
+.page {
+  padding: 24px;
+}
+
+@media (max-width: 640px) {
+  .main {
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    min-height: calc(100dvh - 48px);
+  }
+  .page {
+    padding: 16px;
+  }
+}
+
+@media print {
+  .top {
+    display: none;
+  }
+  .main {
+    margin: 0;
+    border: 0;
   }
 }

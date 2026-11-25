@@ -1,114 +1,89 @@
-import { useEffect, useState, type MouseEvent } from "react";
+import { useState } from "react";
+import { Dialog } from "./Dialog";
+import { Icon } from "./Icon";
 import "./ConfirmDialog.css";
 
 export interface ConfirmDialogProps {
-  /** 본문 메시지(예: '"X"을(를) 삭제할까요?'). */
+  title: string;
+  /** 본문. 무엇이 사라지는지, 대상 이름과 함께 문장으로 쓴다. */
   message: string;
+  /** 확인 버튼 이름. "확인"이 아니라 동작 이름("삭제")을 쓴다. */
+  confirmLabel: string;
   /**
-   * "확인" 클릭 시 호출.
+   * 확인 버튼을 눌렀을 때 호출.
    * Promise를 반환하면 처리 동안 두 버튼이 비활성되고,
-   * 호출자가 명시적으로 onCancel 또는 unmount를 트리거할 때까지 다이얼로그를 유지한다.
+   * 호출자가 onCancel을 부르거나 unmount할 때까지 대화상자를 유지한다.
    */
   onConfirm: () => void | Promise<void>;
-  /** 백드롭 클릭, 취소 버튼, Esc 키 시 호출. */
+  /** 배경 클릭, 취소 버튼, Esc 키 시 호출. 변경은 일어나지 않는다. */
   onCancel: () => void;
-  /** true면 확인 버튼을 ink 배경 + on-primary 텍스트로 강조 표시. */
-  danger?: boolean;
-  /** 부모(예: ItemPopup)가 전달하는 에러 메시지. truthy면 본문 아래 표시. */
+  /** 부모가 전달하는 실패 문장. */
   errorMessage?: string | null;
 }
 
 /**
- * 삭제 확인 다이얼로그.
- *
- * 디자인 토큰:
- *   - 컨테이너: 1px solid --color-hairline + --radius-lg + canvas 배경
- *   - 백드롭: rgba(0,0,0,0.3), 중앙 정렬
- *   - z-index 1100: ItemPopup(1000) 위에 떠야 한다
- *   - 취소: button-secondary-pill (transparent + primary border)
- *   - 확인(danger=true): --color-ink 배경 + --color-on-primary 텍스트, pill
- *   - 확인(danger=false): button-primary
- *
- * 닫기 트리거:
- *   - 백드롭 클릭, 취소 버튼, Esc 키 모두 onCancel만 호출하며 supabase에는 어떤 변경도 가하지 않는다.
+ * 되돌릴 수 없는 동작 앞의 확인 대화상자.
+ * 위험한 동작도 색으로 구분하지 않는다. 대상 이름이 든 문장과 동작 이름 버튼으로 알린다.
  */
 export function ConfirmDialog({
+  title,
   message,
+  confirmLabel,
   onConfirm,
   onCancel,
-  danger = false,
   errorMessage,
 }: ConfirmDialogProps) {
   const [pending, setPending] = useState(false);
 
-  // Esc 키 → onCancel (처리 중에는 무시하여 race 방지).
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && !pending) onCancel();
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [onCancel, pending]);
-
-  const handleBackdropClick = () => {
+  const handleCancel = () => {
+    // 처리 중에는 닫지 않는다 (진행 중인 삭제와 경합 방지).
     if (!pending) onCancel();
   };
 
-  const stop = (e: MouseEvent) => {
-    e.stopPropagation();
-  };
-
-  const handleConfirmClick = async () => {
+  const handleConfirm = async () => {
     if (pending) return;
     setPending(true);
     try {
       await onConfirm();
     } finally {
-      // unmount 후 setState 경고를 피하기 위해, onConfirm이 unmount를 트리거할 수도 있으니
-      // 단순히 항상 reset 시도. (cleanup이 먼저 실행되면 setState 무시됨.)
+      // onConfirm이 unmount를 트리거했다면 이 setState는 무시된다.
       setPending(false);
     }
   };
 
   return (
-    <div
-      className="confirm-dialog__backdrop"
-      role="dialog"
-      aria-modal="true"
-      onClick={handleBackdropClick}
-    >
-      <div className="confirm-dialog" onClick={stop}>
-        <p className="confirm-dialog__message">{message}</p>
-
-        {errorMessage ? (
-          <p className="confirm-dialog__error" role="alert">
-            {errorMessage}
-          </p>
-        ) : null}
-
-        <div className="confirm-dialog__actions">
+    <Dialog
+      title={title}
+      width={440}
+      onClose={handleCancel}
+      footer={
+        <>
           <button
             type="button"
-            className="confirm-dialog__cancel"
-            onClick={onCancel}
+            className="btn btn-2"
+            onClick={handleCancel}
             disabled={pending}
           >
             취소
           </button>
           <button
             type="button"
-            className={
-              danger
-                ? "confirm-dialog__confirm confirm-dialog__confirm--danger"
-                : "confirm-dialog__confirm"
-            }
-            onClick={handleConfirmClick}
+            className="btn btn-1"
+            onClick={() => void handleConfirm()}
             disabled={pending}
           >
-            {pending ? "처리 중..." : "확인"}
+            {pending ? "처리 중" : confirmLabel}
           </button>
-        </div>
-      </div>
-    </div>
+        </>
+      }
+    >
+      <p>{message}</p>
+      {errorMessage ? (
+        <p className="confirm__error err" role="alert">
+          <Icon name="alert" />
+          {errorMessage}
+        </p>
+      ) : null}
+    </Dialog>
   );
 }

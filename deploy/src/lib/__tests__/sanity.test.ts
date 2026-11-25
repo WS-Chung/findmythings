@@ -9,7 +9,6 @@ import {
   MAX_HASHTAGS,
   MAX_HASHTAG_LEN,
   MAX_NAME_LEN,
-  RPC,
   STORAGE_BUCKET,
   TABLES,
 } from "../constants";
@@ -35,7 +34,6 @@ describe("sanity", () => {
     expect(STORAGE_BUCKET).toBe("fmt-item-images");
     expect(TABLES.locations).toBe("fmt_locations");
     expect(TABLES.items).toBe("fmt_items");
-    expect(RPC.searchItems).toBe("fmt_search_items");
   });
 
   it("constructs a supabase client singleton", () => {

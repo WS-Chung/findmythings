@@ -1,12 +1,146 @@
 /* ============================================================
- * Marker — 위치/크기는 컴포넌트의 인라인 스타일로 처리하고
- *   이 파일은 내부 이미지 레이아웃과 hover 상태만 담당한다.
- *   강조 애니메이션(.marker--highlight)은 animations.css에서 정의.
+ * Marker — 중심이 좌표 (left, top)에 오는 마커 버튼.
+ *   --pin-w / --pin-h : 마커 이미지 크기(px). Marker.tsx가 도면 비율로 계산한다.
+ *   --label-shift     : 이름표를 도면 안쪽으로 미는 거리(px).
+ * 그림자·글로우·무한 반복 효과를 쓰지 않는다.
  * ============================================================ */
+.marker {
+  position: absolute;
+  width: var(--pin-w);
+  height: var(--pin-h);
+  padding: 0;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.2s ease-out;
+}
+
+/* 보이는 크기보다 넓은 누르는 영역(휴대폰에서도 40px 이상) */
+.marker::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, 44px);
+  height: max(100%, 44px);
+  transform: translate(-50%, -50%);
+}
+
 .marker__img {
+  display: block;
   width: 100%;
   height: 100%;
-  display: block;
   pointer-events: none;
-  user-select: none;
+  transition: transform 0.12s ease-out;
+}
+
+/* 키보드 초점 */
+.marker:focus-visible {
+  outline: 2px solid var(--navy);
+  outline-offset: 3px;
+  border-radius: var(--r-tag);
+}
+
+/* 겹친 마커는 마우스를 올리거나 초점을 주면 앞으로 나온다 */
+.marker:hover,
+.marker:focus-visible {
+  z-index: 5;
+}
+
+/* ---- 강조 (검색 결과) ---- */
+.marker--highlight {
+  z-index: 3;
+}
+.marker--highlight .marker__img {
+  transform: scale(1.2);
+}
+.marker__ring,
+.marker__ping {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--pin-h) * 1.5);
+  height: calc(var(--pin-h) * 1.5);
+  border-radius: 50%;
+  border: 2px solid var(--navy);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+/* 처음 몇 번만 퍼져 나가는 링. 무한 반복하지 않는다 */
+.marker__ping {
+  opacity: 0;
+  animation: marker-ping 1.1s ease-out 3;
+}
+@keyframes marker-ping {
+  from {
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.9);
+  }
+}
+
+/* ---- 이름표 ---- */
+.marker__label {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(calc(-50% + var(--label-shift, 0px)));
+  padding: 2px 8px;
+  border-radius: var(--r-tag);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  white-space: nowrap;
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid var(--control);
+  pointer-events: none;
+}
+.marker__label--below {
+  bottom: auto;
+  top: calc(100% + 8px);
+}
+/* 강조된 마커의 이름표는 네이비 면 + 흰 글자 */
+.marker--highlight .marker__label {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ---- 마커 수정 모드 ---- */
+.marker--editing {
+  cursor: grab;
+  touch-action: none; /* 끌 때 화면이 같이 스크롤되지 않게 */
+  outline: 1px dashed var(--control-strong);
+  outline-offset: 3px;
+  border-radius: var(--r-tag);
+}
+.marker--editing:focus-visible {
+  outline: 2px solid var(--navy);
+}
+/* 선택한 마커(삭제 대상): 실선 네이비 테두리 + 네이비 이름표 */
+.marker--selected {
+  outline: 2px solid var(--navy);
+  z-index: 4;
+}
+.marker--selected .marker__label {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: #fff;
+  font-weight: 600;
+}
+.marker--dragging {
+  cursor: grabbing;
+  z-index: 4;
+}
+.marker--dragging .marker__label {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: #fff;
 }

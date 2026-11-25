@@ -1,30 +1,49 @@
-/* ============================================================
- * SearchInput — design 토큰 `search-input` 사양.
- *   bg=canvas, color=ink, font=body, radius=pill, padding 12×20, height 44.
- * ============================================================ */
-.search-input {
+/* 검색 입력: 높이 32px, 앞에 14px 돋보기, 오른쪽에 단축키 표시 */
+.search {
+  position: relative;
+}
+.search .ic {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  color: var(--ink-3);
+  pointer-events: none;
+}
+.search .inp {
   width: 100%;
-  height: 44px;
-  padding: 12px 20px;
-  background: var(--color-canvas);
-  color: var(--color-ink);
-  border: 1px solid var(--color-hairline);
-  border-radius: var(--radius-pill);
-  font-family: var(--font-text);
-  font-size: var(--fs-body);
-  line-height: var(--lh-body);
-  letter-spacing: var(--ls-body);
-  outline: none;
-  /* Safari가 type="search"에 추가하는 둥근 모서리/x 버튼을 토큰 안에서 제어한다. */
-  -webkit-appearance: none;
-  appearance: none;
+  padding-left: 32px;
+  padding-right: 36px;
+}
+.search__key {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font: 12px var(--font);
+  color: var(--ink-2);
+  background: var(--frame);
+  border-radius: 4px;
+  padding: 1px 6px;
+  pointer-events: none;
+}
+/* 입력칸을 누르면 `/` 표시는 필요 없다 */
+.search .inp:focus ~ .search__key,
+.search .inp:not(:placeholder-shown) ~ .search__key {
+  display: none;
 }
 
-.search-input::placeholder {
-  color: var(--color-ink-muted-48);
-}
-
-.search-input:focus-visible,
-.search-input:focus {
-  border-color: var(--color-primary-focus);
+@media (max-width: 640px) {
+  .search .ic {
+    left: 12px;
+  }
+  .search .inp {
+    padding-left: 36px;
+  }
+  /* 휴대폰에는 키보드 단축키가 없다 */
+  .search__key {
+    display: none;
+  }
 }

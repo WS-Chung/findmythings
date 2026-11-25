@@ -14,6 +14,9 @@ export interface Location {
   y_pos: number;
 }
 
+/** 마커 위치 저장 후 화면 상태에 반영할 최소 정보. */
+export type LocationPosition = Pick<Location, "id" | "x_pos" | "y_pos">;
+
 export interface Item {
   id: UUID;
   location_id: UUID;
@@ -26,8 +29,3 @@ export interface Item {
   /** ISO timestamptz */
   created_at: string;
 }
-
-export type ItemInsert = Omit<Item, "id" | "created_at">;
-export type ItemUpdate = Partial<Omit<Item, "id" | "created_at" | "location_id">>;
-
-export type Mode = "view" | "register" | "edit";

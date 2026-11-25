@@ -1,0 +1,24 @@
+/* 표 칸 안의 📷 버튼. 행 높이(24px, 휴대폰 40px) 안에 들어간다. */
+.photo-btn {
+  display: inline-grid;
+  place-items: center;
+  min-width: 28px;
+  height: 20px;
+  padding: 0 4px;
+  border-radius: var(--r-tag);
+  font-size: 14px;
+  line-height: 1;
+  vertical-align: middle;
+  transition: background-color 0.12s;
+}
+.photo-btn:hover {
+  background: var(--hover);
+}
+
+@media (max-width: 640px) {
+  .photo-btn {
+    min-width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+}

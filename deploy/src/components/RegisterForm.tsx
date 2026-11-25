@@ -4,6 +4,7 @@ import {
   useState,
   type ChangeEvent,
   type FormEvent,
+  type KeyboardEvent,
 } from "react";
 import {
   MAX_HASHTAGS,
@@ -24,24 +25,23 @@ import {
   validateParent,
 } from "../lib/validators";
 import type { Item, Location, UUID } from "../types/db";
+import { Icon } from "./Icon";
 import "./RegisterForm.css";
 
 export interface RegisterFormProps {
-  /** 폼이 활성화된 Location (헤더는 ItemPopup이 표시함, 등록 모드의 기본 location). */
+  /** 폼이 활성화된 Location (등록 모드의 기본 location). */
   location: Location;
-  /** 전체 locations (수정 모드에서 수납장 이동 드롭다운 옵션). */
+  /** 전체 locations (수정 모드에서 수납장 이동 선택지). */
   locations: Location[];
-  /** 전체 items (parent 후보를 selectedLocationId 기준으로 동적 계산). */
+  /** 전체 items (상위 물품 후보를 선택한 수납장 기준으로 계산). */
   allItems: Item[];
-  /**
-   * 같은 Location 내 Parent_Item 후보들 — 등록 모드의 초기 옵션.
-   * 수정 모드에서 수납장 이동 시 allItems에서 재계산되므로 fallback 용도.
-   */
-  parentCandidates: Item[];
   /** 취소 또는 저장 성공 후 폼을 닫는다. */
   onClose: () => void;
-  /** 저장 성공 시 호출되어 부모의 useAllItems.refetch()를 트리거한다. */
-  onSaved: () => void;
+  /**
+   * 저장 성공 시 호출되어 부모의 useAllItems.refetch()를 트리거한다.
+   * 저장한 물품의 상위 물품 id를 넘겨, 목록이 그 상위 물품을 펼칠 수 있게 한다.
+   */
+  onSaved: (parentId: UUID | null) => void;
   /**
    * 수정 대상 Item. 없으면 등록 모드(=insert), 있으면 수정 모드(=update).
    * 초기 폼 상태는 (name, hashtags, image_url, parent_id, location_id) 모두
@@ -64,16 +64,13 @@ export interface RegisterFormProps {
  *     editItem.image_url 그대로 유지된다.
  *
  * 수납장 이동 (수정 모드 전용):
- *   - selectedLocationId state로 현재 폼이 가리키는 location을 관리.
- *   - 사용자가 드롭다운으로 변경하면 parent_id를 null로 리셋해 다른 수납장의
+ *   - 사용자가 드롭다운으로 바꾸면 parent_id를 null로 리셋해 다른 수납장의
  *     1계층 물품을 새로 고를 수 있게 한다 (2계층 무결성 유지).
- *   - parentCandidates는 selectedLocationId 기준 allItems에서 동적 계산.
  */
 export function RegisterForm({
   location,
   locations,
   allItems,
-  parentCandidates,
   onClose,
   onSaved,
   editItem,
@@ -116,14 +113,10 @@ export function RegisterForm({
   const canSave = nameValid && !submitting;
 
   /**
-   * Parent_Item 후보 — selectedLocationId 기준으로 동적 계산.
-   *   - 같은 location의 parent_id=null 항목
-   *   - 자기 자신은 제외 (자기 참조 방지)
-   *
-   * 수정 모드에서 수납장 이동이 발생하면 자동으로 새 location의 후보 목록으로 갱신.
-   * 등록 모드에서는 props.parentCandidates를 사용하지 않고 동일 식으로 일관 처리.
+   * 상위 물품 후보 — 선택한 수납장의 parent_id=null 항목.
+   * 수정 모드에서는 자기 자신을 뺀다 (자기 참조 방지).
    */
-  const visibleParentCandidates = useMemo(() => {
+  const parentCandidates = useMemo(() => {
     const list = allItems.filter(
       (i) => i.parent_id === null && i.location_id === selectedLocationId,
     );
@@ -158,8 +151,7 @@ export function RegisterForm({
 
   const handleLocationChange = (newLocationId: UUID) => {
     setSelectedLocationId(newLocationId);
-    // 수납장이 바뀌면 기존 parent_id는 다른 location의 parent이므로 무효.
-    // 사용자에게 다시 고르게 강제한다 (2계층 무결성 사전 보장).
+    // 수납장이 바뀌면 기존 parent_id는 다른 수납장의 물품이므로 무효.
     setParentId(null);
   };
 
@@ -183,7 +175,7 @@ export function RegisterForm({
     setError(null);
   };
 
-  const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleTagKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" || e.key === ",") {
       e.preventDefault();
       commitTagDraft();
@@ -217,12 +209,8 @@ export function RegisterForm({
       setError(tagsRes.message);
       return;
     }
-    // parent 무결성은 selectedLocationId 기준으로 검증.
-    const parentRes = validateParent(
-      parentId,
-      allItems,
-      selectedLocationId,
-    );
+    // parent 무결성은 선택한 수납장 기준으로 검증.
+    const parentRes = validateParent(parentId, allItems, selectedLocationId);
     if (!parentRes.ok) {
       setError(parentRes.message);
       return;
@@ -279,7 +267,7 @@ export function RegisterForm({
         if (insErr) throw new Error(insErr.message);
       }
 
-      onSaved();
+      onSaved(parentId);
       onClose();
     } catch (err) {
       console.error("[RegisterForm] save failed:", err);
@@ -287,10 +275,6 @@ export function RegisterForm({
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const handleCancel = () => {
-    onClose();
   };
 
   const originalLocation = isEdit
@@ -302,46 +286,46 @@ export function RegisterForm({
       ? originalLocation.id !== targetLocation.id
       : false;
 
-  // parentCandidates prop은 더 이상 직접 사용하지 않으나 backward-compat 차원에서 보존.
-  void parentCandidates;
-
   return (
-    <form className="register-form" onSubmit={handleSave} noValidate>
-      <div className="register-form__field">
-        <label className="register-form__label" htmlFor="rf-name">
-          이름 <span className="register-form__required">*</span>
+    <form className="rform" onSubmit={handleSave} noValidate>
+      <h3 className="rform__title">{isEdit ? "물건 수정" : "물건 등록"}</h3>
+
+      <div className="field">
+        <label htmlFor="rf-name">
+          이름<span className="opt">필수</span>
         </label>
         <input
           id="rf-name"
           type="text"
-          className="register-form__input"
+          className="inp"
           value={name}
           onChange={(e) => setName(e.target.value)}
           maxLength={MAX_NAME_LEN}
-          placeholder="예) 드라이버 세트"
+          placeholder="예: 드라이버 세트"
           autoFocus
+          autoComplete="off"
         />
-        <p className="register-form__hint">
-          {name.trim().length}/{MAX_NAME_LEN}
+        <p className="hint">
+          {name.trim().length}/{MAX_NAME_LEN}자
         </p>
       </div>
 
-      <div className="register-form__field">
-        <label className="register-form__label" htmlFor="rf-tag">
-          해시태그
+      <div className="field">
+        <label htmlFor="rf-tag">
+          해시태그<span className="opt">선택</span>
         </label>
         {hashtags.length > 0 ? (
-          <ul className="register-form__chips" aria-label="선택된 해시태그">
+          <ul className="rform__chips" aria-label="입력한 해시태그">
             {hashtags.map((t, i) => (
-              <li key={`${t}-${i}`} className="register-form__chip">
+              <li key={`${t}-${i}`} className="tag rform__chip">
                 <span>#{t}</span>
                 <button
                   type="button"
-                  className="register-form__chip-remove"
+                  className="rform__chip-x"
                   onClick={() => removeTagAt(i)}
                   aria-label={`${t} 제거`}
                 >
-                  ×
+                  <Icon name="close" />
                 </button>
               </li>
             ))}
@@ -350,7 +334,7 @@ export function RegisterForm({
         <input
           id="rf-tag"
           type="text"
-          className="register-form__input"
+          className="inp"
           value={tagDraft}
           onChange={(e) => setTagDraft(e.target.value)}
           onKeyDown={handleTagKeyDown}
@@ -360,52 +344,52 @@ export function RegisterForm({
           placeholder={
             hashtags.length >= MAX_HASHTAGS
               ? `최대 ${MAX_HASHTAGS}개`
-              : "Enter 또는 콤마로 추가"
+              : "입력 후 Enter 또는 쉼표"
           }
+          autoComplete="off"
         />
-        <p className="register-form__hint">
-          {hashtags.length}/{MAX_HASHTAGS}
+        <p className="hint">
+          {hashtags.length}/{MAX_HASHTAGS}개
         </p>
       </div>
 
-      <div className="register-form__field">
-        <label className="register-form__label" htmlFor="rf-file">
-          사진
+      <div className="field">
+        <label htmlFor="rf-file">
+          사진<span className="opt">선택</span>
         </label>
         <input
           id="rf-file"
           type="file"
           accept="image/*"
-          className="register-form__file"
+          className="inp rform__file"
           onChange={handleFileChange}
         />
+        <p className="hint">300×300으로 자동 변환해 저장합니다</p>
         {displayPreviewUrl ? (
           <img
             src={displayPreviewUrl}
-            alt={
-              previewUrl ? "선택한 사진 미리보기" : "기존 사진 미리보기"
-            }
-            className="register-form__preview"
-            width={100}
-            height={100}
+            alt={previewUrl ? "선택한 사진 미리보기" : "기존 사진 미리보기"}
+            className="rform__preview"
+            width={96}
+            height={96}
           />
         ) : null}
       </div>
 
-      <div className="register-form__field">
-        <label className="register-form__label" htmlFor="rf-parent">
-          상위 물품
+      <div className="field">
+        <label htmlFor="rf-parent">
+          상위 물품<span className="opt">선택</span>
         </label>
         <select
           id="rf-parent"
-          className="register-form__input"
+          className="inp"
           value={parentId ?? ""}
           onChange={(e) =>
             setParentId(e.target.value === "" ? null : e.target.value)
           }
         >
-          <option value="">(없음)</option>
-          {visibleParentCandidates.map((p) => (
+          <option value="">없음 (수납장에 바로 보관)</option>
+          {parentCandidates.map((p) => (
             <option key={p.id} value={p.id}>
               {p.name}
             </option>
@@ -413,15 +397,13 @@ export function RegisterForm({
         </select>
       </div>
 
-      {/* 수납장 이동 — 수정 모드에서만 노출 (물품을 다른 수납장으로 이동) */}
+      {/* 수납장 이동: 수정 모드에서만 */}
       {isEdit ? (
-        <div className="register-form__field">
-          <label className="register-form__label" htmlFor="rf-location">
-            수납장 이동
-          </label>
+        <div className="field">
+          <label htmlFor="rf-location">수납장</label>
           <select
             id="rf-location"
-            className="register-form__input"
+            className="inp"
             value={selectedLocationId}
             onChange={(e) => handleLocationChange(e.target.value)}
           >
@@ -431,39 +413,32 @@ export function RegisterForm({
               </option>
             ))}
           </select>
-          {locationChanged && originalLocation && targetLocation ? (
-            <p className="register-form__hint">
-              "{originalLocation.name}" → "{targetLocation.name}" 로 이동
-            </p>
-          ) : (
-            <p className="register-form__hint">
-              현재 위치를 유지하려면 그대로 두세요
-            </p>
-          )}
+          <p className="hint">
+            {locationChanged && originalLocation && targetLocation
+              ? `${originalLocation.name}에서 ${targetLocation.name}으로 옮깁니다`
+              : "바꾸면 물건이 다른 수납장으로 옮겨집니다"}
+          </p>
         </div>
       ) : null}
 
       {error ? (
-        <p className="register-form__error" role="alert">
+        <p className="err" role="alert">
+          <Icon name="alert" />
           {error}
         </p>
       ) : null}
 
-      <div className="register-form__actions">
+      <div className="rform__actions">
         <button
           type="button"
-          className="register-form__cancel"
-          onClick={handleCancel}
+          className="btn btn-2"
+          onClick={onClose}
           disabled={submitting}
         >
           취소
         </button>
-        <button
-          type="submit"
-          className="register-form__save"
-          disabled={!canSave}
-        >
-          {submitting ? "저장 중..." : "저장"}
+        <button type="submit" className="btn btn-1" disabled={!canSave}>
+          {submitting ? "저장 중" : "저장"}
         </button>
       </div>
     </form>

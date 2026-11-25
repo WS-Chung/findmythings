@@ -8,6 +8,11 @@ export interface UseAllItemsResult {
   loading: boolean;
   error: Error | null;
   refetch: () => void;
+  /**
+   * 수납장을 지운 뒤, DB의 on delete cascade 로 함께 사라진 그 수납장의 물품을
+   * 다시 조회하지 않고 화면 상태에서 바로 뺀다. (물품은 항상 같은 수납장의 상위 물품 아래에만 있다)
+   */
+  removeByLocation: (locationId: string) => void;
 }
 
 /**
@@ -26,6 +31,10 @@ export function useAllItems(): UseAllItemsResult {
 
   const refetch = useCallback(() => {
     setRefetchTrigger((n) => n + 1);
+  }, []);
+
+  const removeByLocation = useCallback((locationId: string) => {
+    setData((prev) => prev.filter((i) => i.location_id !== locationId));
   }, []);
 
   useEffect(() => {
@@ -62,5 +71,5 @@ export function useAllItems(): UseAllItemsResult {
     };
   }, [refetchTrigger]);
 
-  return { data, loading, error, refetch };
+  return { data, loading, error, refetch, removeByLocation };
 }
