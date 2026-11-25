@@ -113,6 +113,11 @@
   font-weight: 600;
 }
 
+/* ---- 물품 표(팝업)가 열려 있는 동안: 열린 수납장이 아닌 마커 ---- */
+.marker--faded {
+  opacity: 0.5;
+}
+
 /* ---- 마커 수정 모드 ---- */
 .marker--editing {
   cursor: grab;

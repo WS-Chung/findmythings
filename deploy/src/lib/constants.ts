@@ -16,16 +16,17 @@ export const DEBOUNCE_MS = 200;
  * Tall map-pin proportion. `<Marker>`는 이 값에 현재 캔버스 스케일을 곱해 실제 픽셀 크기로
  * 렌더링하므로, 도면이 줄어들면 마커도 비례해서 같이 줄어든다.
  * 마커는 `transform: translate(-50%, -50%)`로 (x_pos, y_pos)에 중심 정렬.
+ * 원래 크기는 24×36이었고, 평면도에서 덜 가리도록 80%(19.2×28.8)로 줄였다. 비율은 2:3 그대로다.
  */
-export const MARKER_WIDTH = 24;
-export const MARKER_HEIGHT = 36;
+export const MARKER_WIDTH = 19.2;
+export const MARKER_HEIGHT = 28.8;
 
 /**
- * 도면이 작아져도(휴대폰) 마커가 이보다 작아지지는 않는다 (px).
+ * 도면이 작아져도(휴대폰) 마커가 이보다 작아지지는 않는다 (px). 원래 최소 18×27의 80%다.
  * 눈에 띄는 최소 크기이며, 누르는 영역은 CSS에서 40px 이상으로 따로 넓힌다.
  */
-export const MARKER_MIN_WIDTH = 18;
-export const MARKER_MIN_HEIGHT = 27;
+export const MARKER_MIN_WIDTH = 14.4;
+export const MARKER_MIN_HEIGHT = 21.6;
 
 /**
  * 위치 수정 모드에서 모든 마커의 이름표를 한꺼번에 보이는 최소 평면도 폭(px).

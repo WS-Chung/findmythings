@@ -291,6 +291,7 @@ export function App() {
                   locations={locations}
                   wrapperWidth={wrapperWidth}
                   highlightedLocationId={highlightedLocationId}
+                  openLocationId={selectedLocation?.id ?? null}
                   editor={editor}
                   onMarkerClick={handleMarkerClick}
                 />

@@ -107,15 +107,18 @@ describe("changedMarkers", () => {
 });
 
 describe("markerBox", () => {
-  it("도면 비율대로 위치와 크기를 정한다 (원본 크기 24×36)", () => {
-    expect(markerBox({ x: 530, y: 370 }, 1)).toEqual({ left: 530, top: 370, width: 24, height: 36 });
-    expect(markerBox({ x: 530, y: 370 }, 0.5)).toEqual({ left: 265, top: 185, width: 18, height: 27 });
+  it("도면 비율대로 위치와 크기를 정한다 (원본 크기 19.2×28.8 = 예전 24×36의 80%)", () => {
+    // 도면 폭(1060px)과 같은 scale 1: 크기는 정수 px로 반올림한다.
+    expect(markerBox({ x: 530, y: 370 }, 1)).toEqual({ left: 530, top: 370, width: 19, height: 29 });
+    expect(markerBox({ x: 530, y: 370 }, 1.2)).toEqual({ left: 636, top: 444, width: 23, height: 35 });
   });
 
-  it("작은 화면에서도 최소 크기(18×27) 아래로 줄지 않는다", () => {
+  it("작은 화면에서도 최소 크기(14.4×21.6 = 예전 18×27의 80%) 아래로 줄지 않는다", () => {
     const b = markerBox({ x: 100, y: 100 }, 0.3);
-    expect(b.width).toBe(18);
-    expect(b.height).toBe(27);
+    expect(b.width).toBeCloseTo(14.4, 5);
+    expect(b.height).toBeCloseTo(21.6, 5);
+    // 최소 크기에서도 마커 이미지의 2:3 비율이 유지된다.
+    expect(b.height / b.width).toBeCloseTo(1.5, 5);
   });
 });
 

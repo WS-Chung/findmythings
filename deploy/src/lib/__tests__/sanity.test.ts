@@ -22,8 +22,9 @@ describe("sanity", () => {
 
   it("exposes validation/debounce/image constants", () => {
     expect(DEBOUNCE_MS).toBeGreaterThan(0);
-    expect(MARKER_WIDTH).toBe(24);
-    expect(MARKER_HEIGHT).toBe(36);
+    // 예전 24×36의 80%
+    expect(MARKER_WIDTH).toBeCloseTo(24 * 0.8, 5);
+    expect(MARKER_HEIGHT).toBeCloseTo(36 * 0.8, 5);
     expect(MAX_HASHTAGS).toBe(4);
     expect(MAX_NAME_LEN).toBe(20);
     expect(MAX_HASHTAG_LEN).toBe(20);

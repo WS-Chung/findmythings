@@ -30,6 +30,8 @@ export interface MarkerProps {
   editing?: boolean;
   /** 마커 수정 모드에서 선택된 마커(삭제 대상). 네이비 테두리와 이름표로 표시한다. */
   selected?: boolean;
+  /** 다른 수납장의 물품 표가 열려 있는 동안 이 마커를 50% 투명도로 흐리게 한다. */
+  faded?: boolean;
   /** 이름표를 보일지. 강조 중이거나 수정 모드에서 부모가 정한다. */
   showLabel?: boolean;
   /** 이름표를 위/아래 중 어디에 둘지. 없으면 도면 위쪽 가장자리일 때만 아래로 내린다. */
@@ -63,6 +65,7 @@ export function Marker({
   highlighted = false,
   editing = false,
   selected = false,
+  faded = false,
   showLabel = false,
   labelSide,
   onClick,
@@ -140,6 +143,7 @@ export function Marker({
     highlighted ? "marker--highlight" : "",
     editing ? "marker--editing" : "",
     editing && selected ? "marker--selected" : "",
+    faded ? "marker--faded" : "",
     editing && dragging ? "marker--dragging" : "",
   ]
     .filter(Boolean)

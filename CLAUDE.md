@@ -98,11 +98,12 @@ npm run build       # tsc -b && vite build → dist/
 - 강조 해제: 검색창 비우기, 다른 결과 클릭, 결과 행 밖 아무 곳 클릭(document click 리스너. 결과 표는 `data-keep-highlight`로 표시).
 - 강조 중에는 `FloorPlan`이 `dimmed` → 배경 투명도 0.7→0.45, 다른 마커 0.35.
 - 검색 결과 클릭 시 ItemPopup은 자동으로 열지 않는다. 사용자가 강조된 마커를 직접 누른다.
+- ItemPopup이 열려 있는 동안에는 어떤 마커를 골랐는지 알 수 있도록 **열린 수납장이 아닌 마커를 50% 투명도로 흐리게** 한다(`MarkerLayer`의 `openLocationId` → `Marker`의 `faded` → `marker--faded`). 선택한 마커가 팝업에 가려지는 것은 알려진 한계로 두었다.
 
 ### 좌표계와 마커
 - 평면도 = **1060×740 가상 캔버스**. DB의 `x_pos`, `y_pos`는 이 기준 정수 픽셀이다.
 - `FloorPlan`이 `ResizeObserver`로 실제 폭 W를 재고 render prop `children(wrapperWidth)`로 넘긴다. `scale = W / 1060`을 x, y에 똑같이 적용한다.
-- 마커는 **중심**이 좌표에 온다. 크기는 원본 24×36에 scale을 곱하되 **최소 18×27**이다(휴대폰에서 너무 작아지지 않게). 누르는 영역은 `Marker.css`의 `::before`로 44px까지 넓혀 있다. 좌표·크기 계산은 `lib/markerPosition.ts`의 순수 함수(`markerBox` 등)이고 테스트가 있다.
+- 마커는 **중심**이 좌표에 온다. 크기는 원본 19.2×28.8(예전 24×36의 80%)에 scale을 곱하되 **최소 14.4×21.6**이다(휴대폰에서 너무 작아지지 않게. 비율 2:3 유지). 누르는 영역은 `Marker.css`의 `::before`로 44px까지 넓혀 있다. 좌표·크기 계산은 `lib/markerPosition.ts`의 순수 함수(`markerBox` 등)이고 테스트가 있다.
 - **강조**: 무한 펄스 대신 고정 링 + 이름표(네이비 면) + 퍼져 나가는 링 **3번**. (hallmark가 반복 장식을 금지한다)
 
 ### 마커 추가
@@ -191,7 +192,8 @@ npm run build       # tsc -b && vite build → dist/
 - **📷 이모지**: 사진이 등록된 물건의 "사진 보기" 버튼에만 쓴다. 사용자 지시다. 다른 곳에는 이모지를 쓰지 않는다(`PhotoButton`).
 - **사이드바 없음, 가운데 열 1200px 제한 없음**: 화면이 하나뿐이고 평면도와 표를 나란히 두는 작업대라 시트 전체 폭을 쓴다.
 - **강조 효과**: hallmark는 반복 애니메이션을 금지하므로 무한 펄스를 쓰지 않는다. 고정 링과 이름표 + 3번만 퍼지는 링이다.
-- **`marker.png`, `background.png`**: 광택 있는 이미지 자산이다. 지도 내용이라 그대로 둔다.
+- **`marker.png`**: 광택 있는 이미지 자산이다. 지도 내용이라 그대로 둔다.
+- **`background.png`**: 흑백 95% + 네이비(`#06438C`) 5%로 색조를 바꾼 평면도다(2026-11-25). 마커의 파란색이 도면 위에서 눈에 띄게 하려는 것이고, 채널 차이가 최대 7/255라 거의 회색으로 보인다. 원본 컬러 이미지는 git 이력(`01e41a7` 이전)에 있다.
 - 굵기는 400·500·600·700을 모두 쓴다(700은 로고·표 머리글·시트 탭).
 - hallmark의 **브라우저 검사기(`checker.html`)는 돌리지 못했다.** 대신 금지 패턴 검색과 1920×1080, 1440×900, 768×1024, 375×812 실제 화면 확인으로 갈음했다.
 
@@ -220,5 +222,5 @@ npm run build       # tsc -b && vite build → dist/
 ## Git
 
 - 기본 브랜치 `main`. Vercel은 `main` push 시 자동 배포된다(연결된 경우).
-- GitHub 원격은 아직 없다. 사용자가 다듬은 뒤 push할 예정이다.
+- GitHub 원격: `https://github.com/WS-Chung/findmythings`(`origin`). 2026-11-25에 이전 버전 이력(루트에 `src/`가 있던 25개 커밋)을 force push로 덮어썼다. **Vercel 프로젝트의 Root Directory는 `deploy`여야 빌드된다**(루트로 두면 `vite: command not found`로 실패한다).
 - 초기 셋업·배포 절차(SQL 실행 순서, Vercel 설정)는 `README.md`에 있다.

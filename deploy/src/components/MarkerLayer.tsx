@@ -10,6 +10,11 @@ export interface MarkerLayerProps {
   wrapperWidth: number;
   /** 검색 결과로 강조된 수납장. */
   highlightedLocationId: UUID | null;
+  /**
+   * 물품 표(팝업)가 열려 있는 수납장. 있으면 어떤 마커를 골랐는지 알 수 있도록
+   * 나머지 마커를 50% 투명도로 흐리게 한다.
+   */
+  openLocationId?: UUID | null;
   editor: Pick<
     UseMarkerEditorResult,
     | "editing"
@@ -43,6 +48,7 @@ export function MarkerLayer({
   locations,
   wrapperWidth,
   highlightedLocationId,
+  openLocationId = null,
   editor,
   onMarkerClick,
 }: MarkerLayerProps) {
@@ -84,6 +90,7 @@ export function MarkerLayer({
             highlighted={highlighted}
             editing={editing}
             selected={editing && loc.id === activeId}
+            faded={openLocationId !== null && loc.id !== openLocationId}
             showLabel={
               highlighted || showAllLabels || (editing && loc.id === activeId)
             }
