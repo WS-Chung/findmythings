@@ -96,7 +96,7 @@ npm run build       # tsc -b && vite build → dist/
 | `deleteTargetId` | 삭제 확인 대화상자의 대상 수납장(마커 수정 모드에서 "삭제"를 눌렀을 때) |
 
 - 강조 해제: 검색창 비우기, 다른 결과 클릭, 결과 행 밖 아무 곳 클릭(document click 리스너. 결과 표는 `data-keep-highlight`로 표시).
-- 강조 중에는 `FloorPlan`이 `dimmed` → 배경 투명도 0.7→0.45, 다른 마커 0.35.
+- 강조 중(또는 마커 추가 중)에는 `FloorPlan`이 `dimmed` → 도면 배경 불투명도 0.45→0.30, 다른 마커 0.35. (평소 도면 불투명도는 0.45. 값은 `FloorPlan.css`)
 - 검색 결과 클릭 시 ItemPopup은 자동으로 열지 않는다. 사용자가 강조된 마커를 직접 누른다.
 - ItemPopup이 열려 있는 동안에는 어떤 마커를 골랐는지 알 수 있도록 **열린 수납장이 아닌 마커를 50% 투명도로 흐리게** 한다(`MarkerLayer`의 `openLocationId` → `Marker`의 `faded` → `marker--faded`). 선택한 마커가 팝업에 가려지는 것은 알려진 한계로 두었다.
 

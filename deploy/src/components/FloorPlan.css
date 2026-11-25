@@ -2,11 +2,11 @@
  * FloorPlan — 1060:740 가상 캔버스.
  *   - 폭은 부모(FloorPlanPanel)의 100%, 높이는 aspect-ratio로 결정된다.
  *   - 1px --edge 테두리 + 패널 모서리(8px). 그림자 없음.
- *   - background.png는 .floorplan__bg가 70% 불투명도로 깐다.
+ *   - background.png는 .floorplan__bg가 45% 불투명도로 깐다.
  *   - 마커는 .floorplan__layer 안에 절대 좌표로 놓인다.
  *
  * 강조 모드(.floorplan--dimmed): 검색 결과 행을 골라 마커가 강조된 동안
- *   도면 배경 0.7 → 0.45, 강조되지 않은 마커 0.35. 상태 변화에만 0.2~0.3초 전환.
+ *   (마커 추가 중에도 같다) 도면 배경 0.45 → 0.30, 강조되지 않은 마커 0.35. 상태 변화에만 0.2~0.3초 전환.
  * ============================================================ */
 .floorplan {
   position: relative;
@@ -25,12 +25,12 @@
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
-  opacity: 0.7;
+  opacity: 0.45;
   pointer-events: none;
   transition: opacity 0.3s ease-out;
 }
 .floorplan--dimmed .floorplan__bg {
-  opacity: 0.45;
+  opacity: 0.3;
 }
 
 .floorplan__layer {
